@@ -1,0 +1,1934 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="description" content="Calculadora de precios y rentabilidad de actividades">
+<style>
+  html { color-scheme: light dark; }
+  body { margin: 0; }
+  img { max-width: 100%; }
+  [hidden] { display: none !important; }
+</style>
+<title>Calculadora de Actividades</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600&family=Manrope:wght@400;500;600&display=swap">
+<style>
+:root{
+  --amarillo:#E8C223;
+  --negro:#000000;
+  --gris-medio:#808285;
+  --gris-claro:#F6F6F6;
+  --blanco:#FFFFFF;
+
+  --fondo:#FFFFFF;
+  --fondo-neutro:#F6F6F6;
+  --superficie:#FFFFFF;
+  --superficie-alt:#FAFAF7;
+  --texto:#000000;
+  --texto-sec:#808285;
+  --linea:#E3E1DA;
+  --linea-fuerte:#C9C6BC;
+  --acento:#E8C223;
+  --acento-texto:#000000;
+  --acento-suave:#FBF3D4;
+  --inverso-fondo:#000000;
+  --inverso-texto:#FFFFFF;
+  --sombra:0 1px 2px rgba(0,0,0,.05), 0 8px 24px rgba(0,0,0,.05);
+  --sombra-alta:0 2px 4px rgba(0,0,0,.06), 0 16px 40px rgba(0,0,0,.10);
+  --logo-claro:block;
+  --logo-oscuro:none;
+  --campo:#FFFFFF;
+  --campo-linea:#C9C6BC;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --fondo:#0B0B0A;
+    --fondo-neutro:#141412;
+    --superficie:#161614;
+    --superficie-alt:#1C1C19;
+    --texto:#F7F6F2;
+    --texto-sec:#9C9A92;
+    --linea:#2C2C27;
+    --linea-fuerte:#42413A;
+    --acento:#E8C223;
+    --acento-texto:#000000;
+    --acento-suave:#332C10;
+    --inverso-fondo:#F7F6F2;
+    --inverso-texto:#000000;
+    --sombra:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.4);
+    --sombra-alta:0 2px 4px rgba(0,0,0,.5), 0 16px 40px rgba(0,0,0,.55);
+    --logo-claro:none;
+    --logo-oscuro:block;
+    --campo:#111110;
+    --campo-linea:#42413A;
+  }
+}
+:root[data-theme="dark"]{
+  --fondo:#0B0B0A;
+  --fondo-neutro:#141412;
+  --superficie:#161614;
+  --superficie-alt:#1C1C19;
+  --texto:#F7F6F2;
+  --texto-sec:#9C9A92;
+  --linea:#2C2C27;
+  --linea-fuerte:#42413A;
+  --acento:#E8C223;
+  --acento-texto:#000000;
+  --acento-suave:#332C10;
+  --inverso-fondo:#F7F6F2;
+  --inverso-texto:#000000;
+  --sombra:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.4);
+  --sombra-alta:0 2px 4px rgba(0,0,0,.5), 0 16px 40px rgba(0,0,0,.55);
+  --logo-claro:none;
+  --logo-oscuro:block;
+  --campo:#111110;
+  --campo-linea:#42413A;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--fondo);
+  color:var(--texto);
+  font-family:'Sarabun',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  font-size:15px;
+  line-height:1.55;
+  padding-inline:24px;
+  padding-block:0 64px;
+}
+.envoltorio{max-width:1320px;margin:0 auto}
+
+h1,h2,h3{font-family:'Sarabun',sans-serif;text-wrap:balance;margin:0}
+h1{font-weight:600;font-size:clamp(26px,3.4vw,38px);line-height:1.15;letter-spacing:-.015em}
+h2{font-weight:600;font-size:17px;letter-spacing:-.005em}
+h3{font-weight:500;font-size:14px}
+p{margin:0}
+
+.eyebrow{
+  font-family:'Manrope',sans-serif;font-weight:600;font-size:10.5px;
+  text-transform:uppercase;letter-spacing:.14em;color:var(--texto-sec);
+}
+
+/* ---------- cabecera ---------- */
+.cabecera{
+  display:flex;justify-content:space-between;align-items:flex-start;gap:24px;
+  flex-wrap:wrap;padding-block:28px 20px;border-bottom:1px solid var(--linea);
+}
+.logo{height:46px;width:auto}
+.logo-claro{display:var(--logo-claro)}
+.logo-oscuro{display:var(--logo-oscuro)}
+.ficha-doc{
+  font-family:'Manrope',sans-serif;font-size:11px;line-height:1.7;
+  color:var(--texto-sec);text-align:right;font-variant-numeric:tabular-nums;
+}
+.ficha-doc strong{color:var(--texto);font-weight:600;display:block;letter-spacing:.04em}
+.titular{padding-block:30px 8px;max-width:64ch}
+.titular .sub{color:var(--texto-sec);font-size:16px;margin-top:10px}
+.regla-acento{height:3px;width:68px;background:var(--acento);margin-block:22px 0;border-radius:2px}
+
+/* ---------- instrucciones ---------- */
+.instrucciones{
+  margin-top:32px;background:var(--fondo-neutro);
+  border:1px solid var(--linea);border-radius:14px;overflow:hidden;
+}
+.instrucciones summary{
+  cursor:pointer;padding:16px 20px;font-family:'Manrope',sans-serif;
+  font-weight:600;font-size:13px;letter-spacing:.02em;list-style:none;
+  display:flex;align-items:center;gap:10px;
+}
+.instrucciones summary::-webkit-details-marker{display:none}
+.instrucciones summary::before{
+  content:"";width:7px;height:7px;border-right:2px solid var(--texto);
+  border-bottom:2px solid var(--texto);transform:rotate(-45deg);transition:transform .18s;
+  flex:none;margin-left:2px;
+}
+.instrucciones[open] summary::before{transform:rotate(45deg)}
+.instrucciones-cuerpo{padding:4px 20px 22px;display:grid;gap:14px;
+  grid-template-columns:repeat(auto-fit,minmax(248px,1fr))}
+.paso{border-top:2px solid var(--acento);padding-top:11px}
+.paso b{display:block;font-family:'Manrope',sans-serif;font-size:12px;font-weight:600;margin-bottom:3px}
+.paso span{font-size:13.5px;color:var(--texto-sec);line-height:1.5}
+
+/* ---------- rejilla principal ---------- */
+.principal{display:grid;grid-template-columns:minmax(0,1fr) 384px;gap:24px;align-items:start;margin-top:26px}
+.columna{display:flex;flex-direction:column;gap:16px;min-width:0}
+
+.tarjeta{
+  background:var(--superficie);border:1px solid var(--linea);
+  border-radius:14px;padding:20px;box-shadow:var(--sombra);
+}
+.tarjeta-cab{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:4px}
+.tarjeta-nota{font-size:13px;color:var(--texto-sec);margin-bottom:14px;line-height:1.45}
+.etiqueta-num{
+  font-family:'Manrope',sans-serif;font-weight:600;font-size:10.5px;letter-spacing:.1em;
+  background:var(--acento);color:var(--acento-texto);padding:3px 8px;border-radius:4px;flex:none;
+}
+
+/* ---------- campos ---------- */
+label{
+  display:block;font-family:'Manrope',sans-serif;font-size:11px;font-weight:500;
+  letter-spacing:.05em;text-transform:uppercase;color:var(--texto-sec);margin-bottom:5px;
+}
+input,select{
+  font-family:'Manrope',sans-serif;font-size:14px;font-weight:500;
+  background:var(--campo);color:var(--texto);
+  border:1px solid var(--campo-linea);border-radius:8px;
+  padding:9px 11px;width:100%;transition:border-color .15s,box-shadow .15s;
+}
+input[inputmode="decimal"],input[inputmode="numeric"]{text-align:right;font-variant-numeric:tabular-nums}
+input:focus,select:focus,button:focus-visible,summary:focus-visible{
+  outline:none;border-color:var(--acento);box-shadow:0 0 0 3px var(--acento-suave);
+}
+button:focus-visible,summary:focus-visible{outline:2px solid var(--acento);outline-offset:2px}
+input::placeholder{color:var(--texto-sec);opacity:.65;font-weight:400}
+
+.rejilla-campos{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+.campo-ancho{grid-column:1/-1}
+
+/* ---------- filas dinámicas ---------- */
+.filas{display:flex;flex-direction:column;gap:8px}
+.fila{
+  display:grid;gap:8px;align-items:center;
+  background:var(--superficie-alt);border:1px solid var(--linea);
+  border-radius:10px;padding:10px;
+}
+.fila-coste{grid-template-columns:minmax(0,1fr) 104px 74px 34px 30px}
+.fila-cf{grid-template-columns:minmax(0,1fr) 104px 74px 82px 34px 30px}
+.fila-equipo{display:block}
+.eq-cab{display:grid;grid-template-columns:minmax(0,1fr) 124px 30px;gap:8px;align-items:center}
+.eq-campos{display:grid;grid-template-columns:repeat(auto-fit,minmax(86px,1fr));gap:8px;margin-top:9px}
+.eq-campos label{font-size:9.5px;letter-spacing:.06em;margin-bottom:3px}
+.eq-nota{
+  margin-top:8px;font-size:12px;line-height:1.4;color:var(--texto-sec);
+  padding-top:7px;border-top:1px dashed var(--linea-fuerte);
+}
+.eq-nota b{color:var(--texto);font-weight:600}
+.fila-opcion{grid-template-columns:minmax(0,1fr) 92px 92px 66px 62px 34px 30px}
+.fila input,.fila select{padding:7px 9px;font-size:13.5px}
+.fila-cab{
+  display:grid;gap:8px;padding:0 10px 2px;
+  font-family:'Manrope',sans-serif;font-size:10px;font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--texto-sec);
+}
+.fila-cab span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fila-cab .der{text-align:right}
+.fila-cab .cen{text-align:center}
+
+.quitar{
+  background:transparent;border:1px solid var(--linea-fuerte);color:var(--texto-sec);
+  border-radius:7px;width:30px;height:30px;cursor:pointer;font-size:16px;line-height:1;
+  display:flex;align-items:center;justify-content:center;padding:0;flex:none;transition:.15s;
+}
+.quitar:hover{border-color:var(--texto);color:var(--texto)}
+.caja-incl{display:flex;align-items:center;justify-content:center}
+.caja-incl input{width:17px;height:17px;padding:0;accent-color:var(--acento);cursor:pointer}
+
+.anadir{
+  margin-top:10px;background:transparent;border:1px dashed var(--linea-fuerte);
+  color:var(--texto);border-radius:9px;padding:9px 14px;cursor:pointer;
+  font-family:'Manrope',sans-serif;font-size:12.5px;font-weight:600;
+  letter-spacing:.03em;width:100%;transition:.15s;
+}
+.anadir:hover{border-color:var(--acento);border-style:solid;background:var(--acento-suave)}
+
+.subtotal{
+  display:flex;justify-content:space-between;align-items:baseline;
+  margin-top:14px;padding-top:12px;border-top:1px solid var(--linea);
+  font-family:'Manrope',sans-serif;font-size:12px;letter-spacing:.04em;
+  text-transform:uppercase;color:var(--texto-sec);font-weight:600;
+}
+.subtotal b{font-size:19px;color:var(--texto);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.vacio{
+  padding:18px 12px;text-align:center;color:var(--texto-sec);font-size:13.5px;
+  background:var(--fondo-neutro);border-radius:9px;border:1px dashed var(--linea-fuerte);
+}
+
+/* ---------- distinción fijo / variable ---------- */
+.tipo-chip{
+  font-family:'Manrope',sans-serif;font-size:9.5px;font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;padding:3px 8px;border-radius:4px;flex:none;white-space:nowrap;
+}
+.tipo-chip.fijo{background:var(--inverso-fondo);color:var(--inverso-texto)}
+.tipo-chip.variable{background:var(--acento);color:var(--acento-texto)}
+
+.definiciones{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:4px}
+.definicion{border-radius:12px;padding:16px;border:1px solid var(--linea)}
+.definicion.fijo{background:var(--inverso-fondo);color:var(--inverso-texto);border-color:var(--inverso-fondo)}
+.definicion.variable{background:var(--acento-suave);border-color:var(--acento)}
+.definicion h3{font-size:15px;font-weight:600;margin-bottom:3px}
+.definicion .prueba{font-size:13.5px;line-height:1.45;margin-bottom:11px;opacity:.85}
+.definicion ul{margin:0;padding-left:17px;font-size:13.5px;line-height:1.7}
+.definicion li::marker{color:var(--acento)}
+.definicion.variable li::marker{color:var(--negro)}
+.definicion .veredicto{
+  font-family:'Manrope',sans-serif;font-size:11px;font-weight:600;letter-spacing:.06em;
+  text-transform:uppercase;margin-top:12px;padding-top:10px;
+  border-top:1px solid rgba(128,130,133,.35);
+}
+
+/* ---------- desglose ---------- */
+.desglose-grupo{margin-bottom:16px}
+.desglose-grupo:last-child{margin-bottom:0}
+.desglose-cab{
+  display:flex;justify-content:space-between;align-items:baseline;gap:10px;
+  padding-bottom:7px;margin-bottom:7px;border-bottom:1px solid var(--linea);
+}
+.desglose-cab .tit{display:flex;align-items:center;gap:8px;
+  font-family:'Manrope',sans-serif;font-size:11px;font-weight:600;
+  letter-spacing:.07em;text-transform:uppercase;color:var(--texto-sec)}
+.desglose-cab b{font-family:'Manrope',sans-serif;font-size:17px;
+  font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.desglose-linea{
+  display:flex;justify-content:space-between;gap:12px;padding:4px 0;
+  font-size:13.5px;font-family:'Manrope',sans-serif;font-variant-numeric:tabular-nums;
+}
+.desglose-linea .calc{color:var(--texto-sec);text-align:right;white-space:nowrap}
+.desglose-linea .concepto{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.escalon{
+  display:inline-block;background:var(--acento);color:var(--acento-texto);
+  font-family:'Manrope',sans-serif;font-size:9.5px;font-weight:600;letter-spacing:.06em;
+  padding:1.5px 6px;border-radius:3px;margin-left:6px;
+}
+
+/* ---------- segmentado ---------- */
+.segmentado{display:flex;gap:0;border:1px solid var(--campo-linea);border-radius:8px;overflow:hidden}
+.segmentado button{
+  flex:1;background:var(--campo);border:none;color:var(--texto-sec);cursor:pointer;
+  padding:9px 8px;font-family:'Manrope',sans-serif;font-size:12.5px;font-weight:600;
+  letter-spacing:.02em;transition:.15s;border-right:1px solid var(--campo-linea);
+}
+.segmentado button:last-child{border-right:none}
+.segmentado button[aria-pressed="true"]{background:var(--acento);color:var(--acento-texto)}
+
+/* ---------- panel de resultados ---------- */
+.panel{position:sticky;top:18px;display:flex;flex-direction:column;gap:14px}
+.panel-precio{
+  background:var(--inverso-fondo);color:var(--inverso-texto);
+  border-radius:14px;padding:20px;box-shadow:var(--sombra-alta);
+}
+.panel-precio .eyebrow{color:var(--acento)}
+.res-opcion{padding-block:15px;border-top:1px solid rgba(128,130,133,.3)}
+.res-opcion:first-of-type{border-top:none;padding-top:13px}
+.res-nombre{font-family:'Sarabun',sans-serif;font-weight:500;font-size:13.5px;
+  color:var(--inverso-texto);opacity:.72;margin-bottom:5px}
+.res-pvp{
+  font-family:'Manrope',sans-serif;font-weight:600;font-size:38px;line-height:1.05;
+  color:var(--acento);font-variant-numeric:tabular-nums;letter-spacing:-.025em;
+}
+.res-pvp small{font-size:14px;font-weight:500;color:var(--inverso-texto);opacity:.6;letter-spacing:0;margin-left:5px}
+.res-detalle{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:11px;
+  font-family:'Manrope',sans-serif;font-size:11px;font-variant-numeric:tabular-nums;
+}
+.res-detalle div{opacity:.78}
+.res-detalle span{display:block;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;opacity:.6;margin-bottom:1px}
+.res-detalle b{font-weight:600;font-size:13px;opacity:1}
+
+.metricas{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.metrica{
+  background:var(--superficie);border:1px solid var(--linea);border-radius:12px;
+  padding:14px;box-shadow:var(--sombra);
+}
+.metrica.destacada{border-left:3px solid var(--acento)}
+.metrica .eyebrow{font-size:9.5px;display:block;margin-bottom:5px}
+.metrica .cifra{
+  font-family:'Manrope',sans-serif;font-weight:600;font-size:23px;line-height:1.1;
+  font-variant-numeric:tabular-nums;letter-spacing:-.02em;
+}
+.metrica .pie{font-size:11.5px;color:var(--texto-sec);margin-top:3px;line-height:1.35}
+
+.aviso{
+  display:flex;gap:10px;align-items:flex-start;border-radius:10px;padding:12px 14px;
+  font-size:13px;line-height:1.45;background:var(--acento-suave);
+  border:1px solid var(--acento);
+}
+.aviso.severo{background:var(--inverso-fondo);color:var(--inverso-texto);border-color:var(--inverso-fondo)}
+.aviso b{font-weight:600}
+.aviso .marca{
+  flex:none;width:4px;align-self:stretch;background:var(--acento);border-radius:2px;
+}
+
+.chip{
+  display:inline-block;font-family:'Manrope',sans-serif;font-size:10px;font-weight:600;
+  letter-spacing:.09em;text-transform:uppercase;padding:2.5px 7px;border-radius:4px;
+  background:var(--acento);color:var(--acento-texto);
+}
+.chip.apagado{background:transparent;color:var(--texto-sec);border:1px solid var(--linea-fuerte)}
+.chip.fuerte{background:var(--inverso-fondo);color:var(--inverso-texto)}
+
+/* ---------- análisis ---------- */
+.analisis{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px;margin-top:16px}
+.contenedor-tabla{overflow-x:auto;margin-top:6px}
+table{width:100%;border-collapse:collapse;font-family:'Manrope',sans-serif;font-size:13px;
+  font-variant-numeric:tabular-nums}
+th{
+  text-align:right;font-size:9.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--texto-sec);padding:0 8px 8px;border-bottom:1px solid var(--linea);white-space:nowrap;
+}
+th:first-child,td:first-child{text-align:left}
+td{padding:9px 8px;border-bottom:1px solid var(--linea);text-align:right;white-space:nowrap}
+tr:last-child td{border-bottom:none}
+tr.previsto td{background:var(--acento-suave);font-weight:600}
+tr.bajo td{color:var(--texto-sec)}
+.barra{height:5px;border-radius:3px;background:var(--acento);display:block;min-width:2px}
+.barra.negativa{background:var(--gris-medio)}
+.celda-barra{width:92px}
+
+/* ---------- paquete ---------- */
+.salida{
+  background:var(--fondo-neutro);border:1px solid var(--linea);border-radius:11px;
+  padding:16px 18px;font-family:'Manrope',sans-serif;font-size:13.5px;line-height:1.65;
+  white-space:pre-wrap;margin-top:6px;max-height:460px;overflow-y:auto;
+}
+.acciones{display:flex;gap:9px;margin-top:12px;flex-wrap:wrap}
+.btn{
+  background:var(--acento);color:var(--acento-texto);border:1px solid var(--acento);
+  border-radius:9px;padding:10px 17px;cursor:pointer;font-family:'Manrope',sans-serif;
+  font-size:12.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;transition:.15s;
+}
+.btn:hover{filter:brightness(1.07)}
+.btn.suave{background:transparent;color:var(--texto);border-color:var(--linea-fuerte)}
+.btn.suave:hover{border-color:var(--texto);filter:none}
+
+.escenarios{display:flex;flex-direction:column;gap:7px;margin-top:12px}
+.escenario{
+  display:flex;justify-content:space-between;align-items:center;gap:10px;
+  background:var(--superficie-alt);border:1px solid var(--linea);
+  border-radius:9px;padding:10px 13px;font-size:13.5px;flex-wrap:wrap;
+}
+.escenario.cerrada{border-left:3px solid var(--acento)}
+.escenario .meta{font-family:'Manrope',sans-serif;font-size:11px;color:var(--texto-sec);
+  font-variant-numeric:tabular-nums}
+.escenario .titulo{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.escenario-acc{display:flex;gap:6px;flex:none}
+.escenario-datos{min-width:0;flex:1}
+
+.registro-barra{
+  display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;
+  margin-top:16px;padding-top:14px;border-top:1px solid var(--linea);
+}
+.registro-barra>div{flex:1;min-width:150px}
+.registro-cifras{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;
+  margin-top:14px;padding:14px;background:var(--fondo-neutro);
+  border:1px solid var(--linea);border-radius:10px;
+}
+.registro-cifras div span{display:block;font-family:'Manrope',sans-serif;font-size:9.5px;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--texto-sec);margin-bottom:3px}
+.registro-cifras div b{font-family:'Manrope',sans-serif;font-size:17px;font-weight:600;
+  font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+
+.cierre-form{
+  width:100%;margin-top:10px;padding-top:11px;border-top:1px dashed var(--linea-fuerte);
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;align-items:end;
+}
+.cierre-form label{font-size:9.5px;margin-bottom:3px}
+.cierre-acc{display:flex;gap:7px;align-items:end}
+
+.avisoEdicion{
+  display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
+  background:var(--acento-suave);border:1px solid var(--acento);
+  border-radius:9px;padding:10px 13px;margin-top:12px;font-size:13.5px;
+}
+.mini{
+  background:transparent;border:1px solid var(--linea-fuerte);color:var(--texto-sec);
+  border-radius:6px;padding:4px 9px;cursor:pointer;font-family:'Manrope',sans-serif;
+  font-size:11px;font-weight:600;transition:.15s;
+}
+.mini:hover{border-color:var(--texto);color:var(--texto)}
+
+/* ---------- pie ---------- */
+.pie{
+  margin-top:44px;padding-top:18px;border-top:1px solid var(--linea);
+  display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;
+  font-family:'Manrope',sans-serif;font-size:11px;color:var(--texto-sec);
+  letter-spacing:.04em;
+}
+.pie img{height:22px;width:auto;opacity:.9}
+.pie-izq{display:flex;align-items:center;gap:11px}
+
+@media (max-width:1060px){
+  .principal{grid-template-columns:1fr}
+  .panel{position:static}
+  .metricas{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+}
+@media (max-width:700px){
+  body{padding-inline:16px}
+  .fila-coste,.fila-cf,.fila-equipo,.fila-opcion{grid-template-columns:1fr 1fr}
+  .fila-coste>*:first-child,.fila-cf>*:first-child,.fila-equipo>*:first-child,.fila-opcion>*:first-child{grid-column:1/-1}
+  .fila-cab{display:none}
+  .quitar{width:100%}
+  .res-pvp{font-size:32px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="envoltorio">
+
+  <header class="cabecera">
+    <div>
+      <img class="logo logo-claro" src="logotipo_negro.jpg" alt="Nevada &amp; Amurai">
+      <img class="logo logo-oscuro" src="logotipo_blanco.png" alt="Nevada &amp; Amurai">
+    </div>
+    <div class="ficha-doc">
+      <strong>HERRAMIENTA DE TRABAJO</strong>
+      NA-BENDHORA-GUIA-2026-09-14<br>
+      14 de septiembre de 2026<br>
+      Bendhora Bcn SL · Entrena Empresa
+    </div>
+  </header>
+
+  <div class="titular">
+    <h1>Calculadora de Actividades</h1>
+    <p class="sub">Pon los costes de una salida, elige el margen que quieres y la herramienta te da el precio por participante, el mínimo de gente para no perder dinero y el paquete listo para enviar.</p>
+    <div class="regla-acento"></div>
+  </div>
+
+  <details class="instrucciones" id="ayuda" open>
+    <summary>Cómo se usa · qué va en cada casilla</summary>
+    <div class="instrucciones-cuerpo">
+      <div class="paso">
+        <b>1 · La actividad</b>
+        <span>Nombre, sitio y fechas. El <b>día de inicio</b> sirve para ordenar el histórico por mes o por año; las <b>fechas para el cliente</b> son el texto que sale en el paquete, tal cual lo escribas.</span>
+      </div>
+      <div class="paso">
+        <b>2 · Costes fijos</b>
+        <span>Lo que cuesta lo mismo vayan 10 o vayan 30: el autocar, el combustible, las dietas del conductor. El importe entero, nunca un total de hotel. Si una salida no tiene ninguno, deja el bloque vacío.</span>
+      </div>
+      <div class="paso">
+        <b>3 · Equipo técnico</b>
+        <span>Sergi, Devi, Pep o el monitor que toque. Siempre coste fijo, nunca se divide como si fueran participantes. Van sus dietas, su alojamiento y solo el dinero que se paga de más: la jornada ordinaria no cuenta porque ya está repartida por línea. Los días fuera se cuentan enteros aunque el coste vaya al 50 %.</span>
+      </div>
+      <div class="paso">
+        <b>4 · Coste por participante</b>
+        <span>Lo que paga todo el mundo por igual: dorsal, seguro, camiseta. Siempre el importe de una sola persona. Lo que cambia según el paquete va en el bloque 5.</span>
+      </div>
+      <div class="paso">
+        <b>5 · Paquetes</b>
+        <span>Cada línea es un paquete con su precio. Alojamiento y comidas van en columnas distintas porque no siempre hay los dos: deja en cero lo que no haya. Pon cuánta gente va en cada paquete y el total de participantes se calcula solo.</span>
+      </div>
+      <div class="paso">
+        <b>6 · Margen y precio</b>
+        <span>Elige el margen que quieres y la herramienta te da el precio. O al revés: pon tú el precio y te dice qué margen te queda. Los importes se meten <b>siempre sin IVA</b>, que es como vienen en la factura del proveedor.</span>
+      </div>
+    </div>
+  </details>
+
+  <section class="tarjeta" style="margin-top:16px">
+    <div class="tarjeta-cab"><h2>Lo único que hay que tener claro antes de empezar</h2><span class="chip">Léelo una vez</span></div>
+    <p class="tarjeta-nota">Meter un coste en el sitio equivocado es el único error que descuadra todo lo demás. Hay una pregunta que lo resuelve siempre: <b>si se cae una persona de la lista, ¿desaparece ese coste?</b></p>
+    <div class="definiciones">
+      <div class="definicion fijo">
+        <h3>Coste fijo</h3>
+        <p class="prueba">Se cae una persona y el coste sigue igual. Se paga entero vayan diez o vayan treinta.</p>
+        <ul>
+          <li>El autocar</li>
+          <li>El combustible y los peajes</li>
+          <li>El alojamiento y las dietas del conductor</li>
+          <li>Las dietas y el alojamiento del equipo técnico</li>
+          <li>El pago extra a un técnico, o el monitor contratado para el día</li>
+          <li>La inscripción de equipo</li>
+        </ul>
+        <p class="veredicto">Se reparte entre los que vayan</p>
+      </div>
+      <div class="definicion variable">
+        <h3>Coste variable</h3>
+        <p class="prueba">Se cae una persona y ese coste desaparece con ella. Nace y muere con cada inscripción.</p>
+        <ul>
+          <li>La habitación de cada participante</li>
+          <li>Las comidas de cada participante</li>
+          <li>El dorsal o la inscripción individual</li>
+          <li>El seguro por persona</li>
+          <li>La camiseta o el obsequio</li>
+        </ul>
+        <p class="veredicto">Se multiplica por cada persona</p>
+      </div>
+    </div>
+    <div class="aviso" style="margin-top:16px">
+      <span class="marca"></span>
+      <div><b>El hotel nunca se mete como un total.</b> Si la habitación cuesta 100 € y van veinte personas, no se escriben 2.000 € en costes fijos: se escriben <b>100 € por persona</b> en el bloque de alojamiento y la calculadora multiplica. Si lo metes como fijo, el precio sale mal en cuanto cambie una sola inscripción.</div>
+    </div>
+    <div class="aviso" style="margin-top:10px">
+      <span class="marca"></span>
+      <div><b>Cuando un coste fijo se llena, aparece otro.</b> Un autocar de 55 plazas cubre hasta 55 personas; con 56 hacen falta dos y el coste se dobla. Por eso cada coste fijo tiene una casilla <b>«cubre hasta»</b>: pon ahí el aforo y la calculadora añade sola la segunda unidad cuando toque.</div>
+    </div>
+    <div class="aviso" style="margin-top:10px">
+      <span class="marca"></span>
+      <div><b>La jornada normal del equipo no se mete aquí.</b> El sueldo de Sergi, de Devi o de Pep es el que es y ya está repartido por línea, así que una actividad dentro de su horario habitual no añade ni un euro. Lo que sí se mete es lo que se paga <b>de más</b> por esta salida concreta: un extra por trabajar fuera de horario, o un monitor contratado para el día. Los días de cada uno se apuntan igualmente, pero para saber cuánto deja la salida por jornada de técnico, no para sumarlos al coste.</div>
+    </div>
+  </section>
+
+  <div class="principal">
+
+    <!-- ══════════ COLUMNA DE ENTRADA ══════════ -->
+    <div class="columna">
+
+      <section class="tarjeta">
+        <div class="tarjeta-cab"><h2>La actividad</h2><span class="etiqueta-num">1</span></div>
+        <div class="rejilla-campos">
+          <div class="campo-ancho">
+            <label for="f-nombre">Nombre de la actividad</label>
+            <input id="f-nombre" type="text" placeholder="Competición NW · Vitoria-Gasteiz">
+          </div>
+          <div>
+            <label for="f-lugar">Lugar</label>
+            <input id="f-lugar" type="text" placeholder="Vitoria-Gasteiz">
+          </div>
+          <div>
+            <label for="f-fecha">Día de inicio</label>
+            <input id="f-fecha" type="date">
+          </div>
+          <div>
+            <label for="f-fechas">Fechas para el cliente</label>
+            <input id="f-fechas" type="text" placeholder="21 y 22 de febrero">
+          </div>
+          <div>
+            <label for="f-tipo">Tipo</label>
+            <select id="f-tipo">
+              <option value="competicion">Competición</option>
+              <option value="finde">Fin de semana</option>
+              <option value="dia">Excursión de día</option>
+              <option value="otro">Otro</option>
+            </select>
+          </div>
+          <div>
+            <label for="f-limite">Cierre de inscripción</label>
+            <input id="f-limite" type="text" placeholder="15 de enero">
+          </div>
+        </div>
+      </section>
+
+      <section class="tarjeta">
+        <div class="tarjeta-cab"><h2>Costes fijos de la actividad</h2>
+          <span style="display:flex;gap:6px;align-items:center;flex:none">
+            <span class="tipo-chip fijo">Se reparte</span><span class="etiqueta-num">2</span></span></div>
+        <p class="tarjeta-nota">El importe <b>entero</b> del autocar, el combustible, los peajes. Nunca un total de hotel ni de comidas: eso va en los bloques 4 y 5. En <b>cubre hasta</b> pon el aforo si el coste tiene uno —las plazas del autocar— y déjalo vacío si no lo tiene. <b>Si cada uno va por su cuenta o en transporte público, deja el bloque vacío</b>: no hay transporte que repartir y la salida rinde desde el primer inscrito.</p>
+        <div class="fila-cab fila-cf">
+          <span>Concepto</span><span class="der">Importe sin IVA</span><span class="cen">IVA</span><span class="der">Cubre hasta</span><span class="cen">Incl.</span><span></span>
+        </div>
+        <div class="filas" id="filas-cf"></div>
+        <button class="anadir" type="button" data-anadir="cf">Añadir coste fijo</button>
+        <div class="subtotal"><span>Total costes fijos</span><b id="sub-cf">0,00 €</b></div>
+      </section>
+
+      <section class="tarjeta">
+        <div class="tarjeta-cab"><h2>Equipo técnico</h2>
+          <span style="display:flex;gap:6px;align-items:center;flex:none">
+            <span class="tipo-chip fijo">Se reparte</span><span class="etiqueta-num">3</span></span></div>
+        <p class="tarjeta-nota">Sergi, Devi, Pep o el monitor que toque. <b>Siempre coste fijo</b>, aunque sean personas: su coste no depende de cuánta gente se apunte. Elige cómo se le paga —dentro de nómina, con un pago extra o por factura— y <b>solo entra lo que se paga de más</b>: la jornada ordinaria ya está repartida por línea. Las dos casillas pequeñas no son lo mismo: en <b>días fuera</b> van los días que esa persona está dedicada a la salida —aunque parte del viaje sea suyo, la empresa los pierde igual—, y en <b>% del coste</b> va qué parte de su dinero (pago extra, hotel y dietas) carga a la actividad. En una competición donde Sergi además compite: <b>2 días fuera al 50 % del coste</b>.</p>
+        <div class="filas" id="filas-eq"></div>
+        <button class="anadir" type="button" data-anadir="eq">Añadir persona del equipo</button>
+        <div class="subtotal"><span>Total equipo técnico</span><b id="sub-eq">0,00 €</b></div>
+      </section>
+
+      <section class="tarjeta">
+        <div class="tarjeta-cab"><h2>Coste por participante</h2>
+          <span style="display:flex;gap:6px;align-items:center;flex:none">
+            <span class="tipo-chip variable">Se multiplica</span><span class="etiqueta-num">4</span></span></div>
+        <p class="tarjeta-nota">Lo que paga <b>todo el mundo por igual</b>, vaya en el paquete que vaya: dorsal, seguro, camiseta. Si la comida es la misma para todos también puede ir aquí; si cambia según el paquete, va en el bloque 5. Importes <b>sin IVA y de una sola persona</b>.</p>
+        <div class="fila-cab fila-coste">
+          <span>Concepto</span><span class="der">Por persona</span><span class="cen">IVA</span><span class="cen">Incl.</span><span></span>
+        </div>
+        <div class="filas" id="filas-cv"></div>
+        <button class="anadir" type="button" data-anadir="cv">Añadir coste por participante</button>
+        <div class="subtotal"><span>Coste variable por persona</span><b id="sub-cv">0,00 €</b></div>
+      </section>
+
+      <section class="tarjeta">
+        <div class="tarjeta-cab"><h2>Paquetes</h2>
+          <span style="display:flex;gap:6px;align-items:center;flex:none">
+            <span class="tipo-chip variable">Se multiplica</span><span class="etiqueta-num">5</span></span></div>
+        <p class="tarjeta-nota">Cada línea es un paquete con su propio precio de venta. Alojamiento y comidas van separados porque no siempre hay los dos: una salida de un día lleva comida y cero alojamiento, y una competición al revés. <b>Deja en cero lo que no haya.</b> Los importes son siempre <b>de una sola persona</b>: si la individual cuesta 120 € escribe 120, no 120 por los que van.</p>
+        <div class="fila-cab fila-opcion">
+          <span>Paquete</span><span class="der">Alojamiento</span><span class="der">Comidas</span><span class="cen">IVA</span><span class="der">Personas</span><span class="cen">Incl.</span><span></span>
+        </div>
+        <div class="filas" id="filas-op"></div>
+        <button class="anadir" type="button" data-anadir="op">Añadir opción</button>
+        <div class="subtotal"><span>Participantes totales</span><b id="sub-op">0</b></div>
+      </section>
+
+      <section class="tarjeta">
+        <div class="tarjeta-cab"><h2>Margen y precio</h2><span class="etiqueta-num">6</span></div>
+        <p class="tarjeta-nota">Decide desde dónde quieres calcular. Con <b>el precio que pongo</b>, aparece un campo de PVP dentro de cada opción del bloque 5: escribes ahí el precio final y la herramienta te dice el margen que queda.</p>
+
+        <div style="margin-bottom:14px">
+          <label for="seg-calculo">Calcular desde</label>
+          <div class="segmentado" id="seg-calculo" role="group" aria-label="Modo de cálculo">
+            <button type="button" data-calculo="margen" aria-pressed="true">El margen que quiero</button>
+            <button type="button" data-calculo="precio" aria-pressed="false">El precio que pongo</button>
+          </div>
+        </div>
+
+        <div class="rejilla-campos">
+          <div class="campo-ancho" id="bloque-margen">
+            <label for="seg-base">El margen se mide sobre</label>
+            <div class="segmentado" id="seg-base" role="group" aria-label="Base del margen">
+              <button type="button" data-base="ventas" aria-pressed="true">El precio de venta</button>
+              <button type="button" data-base="coste" aria-pressed="false">El coste</button>
+            </div>
+          </div>
+          <div id="campo-margen">
+            <label for="f-margen">Margen objetivo (%)</label>
+            <input id="f-margen" type="text" inputmode="decimal" value="25">
+          </div>
+          <div>
+            <label for="f-iva">IVA de venta (%)</label>
+            <input id="f-iva" type="text" inputmode="decimal" value="21">
+          </div>
+          <div>
+            <label for="f-redondeo">Redondeo al alza</label>
+            <select id="f-redondeo">
+              <option value="0">Sin redondeo</option>
+              <option value="1">A 1 €</option>
+              <option value="5" selected>A 5 €</option>
+              <option value="10">A 10 €</option>
+            </select>
+          </div>
+        </div>
+
+        <p class="eq-nota" id="equiv-margen" style="border-top:none;padding-top:0;margin-top:12px"></p>
+
+        <div class="aviso" style="margin-top:15px">
+          <span class="marca"></span>
+          <div><b>Referencia del semestre.</b> El margen de contribución de Actividades NW fue del <b>20,4 %</b> sobre ventas. Si calculas sobre el precio de venta, por debajo de ese número la salida rinde menos que la actividad normal.</div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ══════════ PANEL DE RESULTADOS ══════════ -->
+    <aside class="panel">
+      <div class="panel-precio">
+        <p class="eyebrow">Precio al cliente · IVA incluido</p>
+        <div id="panel-opciones"></div>
+      </div>
+
+      <div class="metricas" id="panel-metricas"></div>
+      <div id="panel-avisos"></div>
+    </aside>
+
+  </div>
+
+  <section class="tarjeta" style="margin-top:16px">
+    <div class="tarjeta-cab"><h2>De dónde sale el coste</h2><span class="chip apagado">Comprobación</span></div>
+    <p class="tarjeta-nota">Mira esta lista antes de dar un precio. Si algo que debería multiplicarse por persona aparece arriba como fijo, está mal metido.</p>
+    <div id="desglose"></div>
+  </section>
+
+  <!-- ══════════ ANÁLISIS ══════════ -->
+  <div class="analisis">
+
+    <section class="tarjeta">
+      <div class="tarjeta-cab"><h2>Si viene menos gente</h2><span class="chip apagado">Sensibilidad</span></div>
+      <p class="tarjeta-nota">Con los precios ya fijados. Los costes fijos se reparten entre menos personas, así que el margen cae. La fila resaltada es lo previsto.</p>
+      <div class="contenedor-tabla">
+        <table id="tabla-sensibilidad">
+          <thead><tr>
+            <th>Personas</th><th>Coste/pers.</th><th>Margen/pers.</th><th>Margen total</th><th>%</th><th class="celda-barra"></th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="tarjeta">
+      <div class="tarjeta-cab"><h2>IVA</h2><span class="chip apagado">Memorándum</span></div>
+      <p class="tarjeta-nota">El IVA <b>no es un gasto</b> y no entra en el resultado de la actividad. Esto es solo el efecto en tesorería: lo que pagas a los proveedores, lo que cobras al cliente y lo que hay que ingresar en Hacienda.</p>
+      <div class="contenedor-tabla">
+        <table id="tabla-iva"><tbody></tbody></table>
+      </div>
+      <div class="aviso" style="margin-top:14px">
+        <span class="marca"></span>
+        <div><b>Antes de facturar.</b> Este cálculo asume régimen general: se repercute el 21 % sobre el servicio completo y se deduce el IVA soportado del autocar y el hotel. Si la gestoría tuviera a Bendhora en el régimen especial de agencias de viajes, la mecánica cambia entera. Hay que confirmarlo una vez.</div>
+      </div>
+    </section>
+
+  </div>
+
+  <section class="tarjeta" style="margin-top:16px">
+    <div class="tarjeta-cab"><h2>El paquete, listo para enviar</h2><span class="chip">Sale de los números de arriba</span></div>
+    <p class="tarjeta-nota">Se construye solo con lo que has marcado como incluido. Es una base con los datos correctos: el tono y el gancho los pone Sergi.</p>
+    <div class="salida" id="salida-paquete"></div>
+    <div class="acciones">
+      <button class="btn" type="button" id="btn-copiar">Copiar paquete</button>
+      <button class="btn suave" type="button" id="btn-copiar-interno">Copiar resumen interno</button>
+    </div>
+  </section>
+
+  <section class="tarjeta" style="margin-top:16px" id="tarjeta-registro">
+    <div class="tarjeta-cab"><h2>Registro de actividades</h2><span class="chip apagado">En este navegador</span></div>
+    <p class="tarjeta-nota">Cada actividad que guardes se queda aquí y se va acumulando. Cuando la salida termine y sepas cuánta gente fue de verdad, la cierras con el número real y verás lo que dejó frente a lo que habías previsto.</p>
+
+    <div class="aviso">
+      <span class="marca"></span>
+      <div><b>Se guarda en este navegador y en este ordenador.</b> No viaja a ningún servidor, así que no se comparte solo: la lista de Devi y la de Sergi son distintas. Tres cosas que conviene hacer:
+      guardar la página en marcadores para volver siempre a la misma;
+      <b>descargar el listado de vez en cuando</b>, porque si se borran los datos de navegación el registro se pierde;
+      y si queréis trabajar sobre la misma lista, uno exporta la copia y el otro la importa.</div>
+    </div>
+
+    <div class="acciones">
+      <button class="btn" type="button" id="btn-guardar">Guardar actividad</button>
+      <button class="btn suave" type="button" id="btn-nueva">Empezar una nueva</button>
+    </div>
+
+    <div id="aviso-edicion"></div>
+
+    <div class="registro-barra">
+      <div>
+        <label for="f-periodo">Periodo</label>
+        <select id="f-periodo">
+          <option value="mes">Este mes</option>
+          <option value="trimestre">Este trimestre</option>
+          <option value="semestre">Este semestre</option>
+          <option value="anio">Este año</option>
+          <option value="todas" selected>Todas</option>
+        </select>
+      </div>
+      <div>
+        <label for="f-filtro-estado">Estado</label>
+        <select id="f-filtro-estado">
+          <option value="todas" selected>Todas</option>
+          <option value="prevista">Solo previstas</option>
+          <option value="cerrada">Solo cerradas</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="registro-cifras" id="registro-cifras"></div>
+    <div class="escenarios" id="lista-registro"></div>
+
+    <div class="acciones">
+      <button class="btn" type="button" id="btn-csv">Descargar listado</button>
+      <button class="btn suave" type="button" id="btn-exportar">Exportar copia</button>
+      <button class="btn suave" type="button" id="btn-importar">Importar copia</button>
+      <input type="file" id="fichero-importar" accept="application/json,.json" hidden>
+    </div>
+  </section>
+
+  <footer class="pie">
+    <div class="pie-izq">
+      <img src="icono_amarillo.png" alt="">
+      <span>NA-BENDHORA-GUIA-2026-09-14 · Nevada &amp; Amurai</span>
+    </div>
+    <span>Confidencial</span>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ─────────── utilidades ─────────── */
+var eur = new Intl.NumberFormat('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2});
+var pct = new Intl.NumberFormat('es-ES',{minimumFractionDigits:1,maximumFractionDigits:1});
+
+function money(v){ return (isFinite(v)?eur.format(v):'—')+' €'; }
+function percent(v){ return (isFinite(v)?pct.format(v*100):'—')+' %'; }
+
+function parseNum(txt){
+  if(txt===null||txt===undefined) return 0;
+  var s=String(txt).trim().replace(/[^\d,.\-]/g,'');
+  if(!s) return 0;
+  var lastComma=s.lastIndexOf(','), lastDot=s.lastIndexOf('.');
+  if(lastComma>-1&&lastDot>-1){
+    if(lastComma>lastDot){ s=s.replace(/\./g,'').replace(',','.'); }
+    else { s=s.replace(/,/g,''); }
+  } else if(lastComma>-1){
+    s=s.replace(/\./g,'').replace(',','.');
+  }
+  var n=parseFloat(s);
+  return isFinite(n)?n:0;
+}
+function ceilTo(v,step){
+  if(!step||step<=0) return v;
+  return Math.ceil(v/step-1e-9)*step;
+}
+function esc(s){
+  return String(s==null?'':s).replace(/[&<>"']/g,function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+var uid=0; function nextId(){ return 'r'+(++uid); }
+
+/* ─────────── estado ─────────── */
+var estado={
+  nombre:'Competición NW · Vitoria-Gasteiz',
+  lugar:'Vitoria-Gasteiz',
+  fechas:'',
+  fecha:'',
+  tipo:'competicion',
+  limite:'',
+  cf:[
+    {id:nextId(),concepto:'Autocar ida y vuelta',importe:2431.82,iva:10,incl:true,capacidad:0},
+    {id:nextId(),concepto:'Alojamiento y dietas del conductor',importe:120,iva:10,incl:false,capacidad:0}
+  ],
+  eq:[
+    {id:nextId(),nombre:'Sergi · técnico',tipo:'nomina',jornadas:2,pct:50,importe:0,alojamiento:120,dietas:0,iva:10}
+  ],
+  cv:[
+    {id:nextId(),concepto:'Dorsal / inscripción',importe:0,iva:10,incl:true}
+  ],
+  op:[
+    {id:nextId(),nombre:'Habitación individual',aloj:120,comidas:0,iva:10,personas:28,incl:true,precio:0}
+  ],
+  modoCalculo:'margen',
+  baseMargen:'ventas',
+  margen:25,
+  ivaVenta:21,
+  redondeo:5
+};
+
+/* ─────────── cálculo ─────────── */
+/* Los costes fijos se pagan enteros vayan los que vayan, pero algunos tienen aforo:
+   un autocar de 55 plazas cubre 55 personas y con 56 hacen falta dos. */
+function cfEn(n){
+  var base=0, iva=0, detalle=[];
+  estado.cf.forEach(function(r){
+    var u=(r.capacidad>0&&n>0)?Math.ceil(n/r.capacidad):1;
+    var total=r.importe*u;
+    base+=total; iva+=total*r.iva/100;
+    detalle.push({concepto:r.concepto,importe:r.importe,unidades:u,total:total});
+  });
+  /* La jornada ordinaria de plantilla NO entra: ya está pagada y repartida por línea
+     en el cuadrante de dedicación. Solo entra lo que se paga de más por esta salida. */
+  var jornadas=0;
+  estado.eq.forEach(function(r){
+    var f=r.pct/100;
+    var extra=(r.tipo==='nomina'?0:r.importe)*f;
+    var gastos=(r.alojamiento+r.dietas)*f;
+    var total=extra+gastos;
+    base+=total;
+    /* El IVA solo existe donde hay factura: alojamiento y dietas siempre;
+       el pago extra solo si es un externo que factura, nunca si es nómina. */
+    iva+=gastos*r.iva/100;
+    if(r.tipo==='externo') iva+=extra*r.iva/100;
+    /* El % reduce el dinero, nunca los días: si está fuera dos jornadas, la empresa
+       pierde dos jornadas de esa persona aunque parte del viaje sea suyo. */
+    jornadas+=r.jornadas;
+    detalle.push({
+      concepto:r.nombre||'Equipo técnico',importe:total,unidades:1,total:total,
+      extra:extra, gastos:gastos, tipo:r.tipo, jornadas:r.jornadas
+    });
+  });
+  return {base:base,iva:iva,detalle:detalle,jornadas:jornadas};
+}
+
+function calcular(){
+  var n=0;
+  estado.op.forEach(function(o){ n+=o.personas; });
+
+  var cf=cfEn(n);
+  var cfBase=cf.base, cfIva=cf.iva;
+
+  var cvBase=0, cvIvaUd=0;
+  estado.cv.forEach(function(r){ cvBase+=r.importe; cvIvaUd+=r.importe*r.iva/100; });
+
+  var ivaV=estado.ivaVenta/100;
+  var m=estado.margen/100;
+  if(estado.baseMargen==='ventas'&&m>=0.95) m=0.95;
+
+  var opciones=estado.op.map(function(o){
+    var propio=o.aloj+o.comidas;
+    var cvOp=cvBase+propio;
+    var costePax=(n>0? cfBase/n : NaN)+cvOp;
+    var pvpIva, base;
+    if(estado.modoCalculo==='precio'&&o.precio>0){
+      pvpIva=o.precio;
+    } else {
+      var bruto = estado.baseMargen==='ventas' ? costePax/(1-m) : costePax*(1+m);
+      pvpIva=ceilTo(bruto*(1+ivaV), estado.redondeo);
+    }
+    base=pvpIva/(1+ivaV);
+    var margenPax=base-costePax;
+    return {
+      id:o.id, nombre:o.nombre, personas:o.personas, incl:o.incl,
+      aloj:o.aloj, comidas:o.comidas,
+      cvOp:cvOp, costePax:costePax, pvpIva:pvpIva, base:base,
+      margenPax:margenPax,
+      margenPct: base>0 ? margenPax/base : NaN,
+      ivaSoportadoPax: cvIvaUd + propio*o.iva/100
+    };
+  });
+
+  var ingresosBase=0, costesTot=cfBase, margenTot=0, ivaSoportado=cfIva, contribTot=0;
+  opciones.forEach(function(o){
+    if(!isFinite(o.base)) return;
+    ingresosBase+=o.base*o.personas;
+    costesTot+=o.cvOp*o.personas;
+    ivaSoportado+=o.ivaSoportadoPax*o.personas;
+    contribTot+=(o.base-o.cvOp)*o.personas;
+  });
+  margenTot=ingresosBase-costesTot;
+
+  var contribMedia = n>0 ? contribTot/n : 0;
+  var ivaRepercutido=ingresosBase*ivaV;
+
+  var res={
+    cfBase:cfBase, cfDetalle:cf.detalle, cvBase:cvBase, n:n, opciones:opciones,
+    ingresosBase:ingresosBase, costesTot:costesTot, margenTot:margenTot,
+    margenPct: ingresosBase>0 ? margenTot/ingresosBase : NaN,
+    jornadas:cf.jornadas,
+    contribJornada: cf.jornadas>0 ? margenTot/cf.jornadas : NaN,
+    contribMedia:contribMedia,
+    ivaSoportado:ivaSoportado, ivaRepercutido:ivaRepercutido,
+    ivaLiquidar:ivaRepercutido-ivaSoportado,
+    cobroTotal: ingresosBase*(1+ivaV)
+  };
+  res.puntoMuerto=puntoMuertoDe(res);
+  return res;
+}
+
+/* margen total a un número distinto de participantes, con los precios ya fijados.
+   Recalcula los costes fijos porque pueden escalonar al cambiar el aforo. */
+function margenA(nObjetivo, c){
+  if(c.n<=0) return {margen:NaN,costePax:NaN,margenPax:NaN,pct:NaN};
+  var cf=cfEn(nObjetivo);
+  var ingresos=0, costesVar=0, personas=0;
+  c.opciones.forEach(function(o){
+    var np=Math.round(nObjetivo*(o.personas/c.n));
+    personas+=np;
+    ingresos+=o.base*np;
+    costesVar+=o.cvOp*np;
+  });
+  if(personas<=0) return {margen:-cf.base,costePax:NaN,margenPax:NaN,pct:NaN};
+  var margen=ingresos-costesVar-cf.base;
+  return {
+    margen:margen, ingresos:ingresos, costes:costesVar+cf.base,
+    cfBase:cf.base, cvTotal:costesVar, personas:personas,
+    costePax:(cf.base/personas)+(costesVar/personas),
+    margenPax:margen/personas,
+    pct: ingresos>0 ? margen/ingresos : NaN
+  };
+}
+
+/* Se busca por iteración y no con una división: con costes fijos escalonados
+   el umbral puede saltar hacia atrás al aparecer un segundo autocar. */
+function puntoMuertoDe(c){
+  if(c.n<=0) return null;
+  if(c.cfBase<=0) return 0;
+  var limite=Math.max(c.n*3,300);
+  for(var k=1;k<=limite;k++){
+    if(margenA(k,c).margen>=0) return k;
+  }
+  return Infinity;
+}
+
+/* ─────────── filas ─────────── */
+var opcionesIva='<option value="0">0 %</option><option value="10">10 %</option><option value="21">21 %</option>';
+
+function pintarFilas(){
+  var cf=document.getElementById('filas-cf');
+  cf.innerHTML = estado.cf.length ? estado.cf.map(function(r){
+    return '<div class="fila fila-cf" data-lista="cf" data-id="'+r.id+'">'+
+      '<input type="text" data-campo="concepto" id="cf-c-'+r.id+'" value="'+esc(r.concepto)+'" placeholder="Concepto" aria-label="Concepto">'+
+      '<input type="text" inputmode="decimal" data-campo="importe" id="cf-i-'+r.id+'" value="'+eur.format(r.importe)+'" aria-label="Importe entero sin IVA">'+
+      '<select data-campo="iva" id="cf-v-'+r.id+'" aria-label="Tipo de IVA">'+opcionesIva+'</select>'+
+      '<input type="text" inputmode="numeric" data-campo="capacidad" id="cf-k-'+r.id+'" value="'+(r.capacidad>0?r.capacidad:'')+'" placeholder="sin tope" aria-label="Cubre hasta cuántas personas">'+
+      '<span class="caja-incl"><input type="checkbox" data-campo="incl" id="cf-x-'+r.id+'" '+(r.incl?'checked':'')+' aria-label="Incluir en el paquete"></span>'+
+      '<button class="quitar" type="button" data-quitar aria-label="Quitar">&times;</button>'+
+    '</div>';
+  }).join('') : '<div class="vacio">Sin costes fijos. Esta actividad rinde desde el primer participante.</div>';
+  estado.cf.forEach(function(r){ var s=document.getElementById('cf-v-'+r.id); if(s) s.value=String(r.iva); });
+
+  var eq=document.getElementById('filas-eq');
+  eq.innerHTML = estado.eq.length ? estado.eq.map(function(r){
+    var etiqueta={nomina:'Dentro de nómina',extra:'Pago extra',externo:'Externo (factura)'}[r.tipo];
+    var nota={
+      nomina:'Su jornada ya está pagada y repartida por línea, así que no añade coste a esta salida. Sus días sí se cuentan enteros, para saber cuánto deja la actividad por jornada de técnico. El IVA de la casilla es el de su hotel y sus dietas, que son facturas de terceros: su jornada no lleva IVA.',
+      extra:'Se le paga de más por esta salida. Es coste real y solo existe si la salida se hace. Ese pago <b>no lleva IVA</b> porque es nómina; el IVA de la casilla solo afecta a su hotel y sus dietas.',
+      externo:'Factura sus horas. Coste real, solo existe si la salida se hace, y lleva IVA igual que su hotel y sus dietas.'
+    }[r.tipo];
+    return '<div class="fila fila-equipo" data-lista="eq" data-id="'+r.id+'">'+
+      '<div class="eq-cab">'+
+        '<input type="text" data-campo="nombre" id="eq-n-'+r.id+'" value="'+esc(r.nombre)+'" placeholder="Nombre o rol" aria-label="Nombre o rol">'+
+        '<select data-campo="tipo" id="eq-t-'+r.id+'" aria-label="Cómo se le paga">'+
+          '<option value="nomina">Dentro de nómina</option>'+
+          '<option value="extra">Pago extra</option>'+
+          '<option value="externo">Externo (factura)</option></select>'+
+        '<button class="quitar" type="button" data-quitar aria-label="Quitar">&times;</button>'+
+      '</div>'+
+      '<div class="eq-campos">'+
+        '<div><label for="eq-j-'+r.id+'">Días fuera</label>'+
+          '<input type="text" inputmode="decimal" data-campo="jornadas" id="eq-j-'+r.id+'" value="'+r.jornadas+'"></div>'+
+        '<div><label for="eq-m-'+r.id+'">% del coste</label>'+
+          '<input type="text" inputmode="numeric" data-campo="pct" id="eq-m-'+r.id+'" value="'+r.pct+'"></div>'+
+        (r.tipo==='nomina' ? '' :
+        '<div><label for="eq-p-'+r.id+'">'+(r.tipo==='extra'?'Pago extra':'Honorarios')+'</label>'+
+          '<input type="text" inputmode="decimal" data-campo="importe" id="eq-p-'+r.id+'" value="'+eur.format(r.importe)+'"></div>')+
+        '<div><label for="eq-a-'+r.id+'">Alojamiento</label>'+
+          '<input type="text" inputmode="decimal" data-campo="alojamiento" id="eq-a-'+r.id+'" value="'+eur.format(r.alojamiento)+'"></div>'+
+        '<div><label for="eq-d-'+r.id+'">Dietas</label>'+
+          '<input type="text" inputmode="decimal" data-campo="dietas" id="eq-d-'+r.id+'" value="'+eur.format(r.dietas)+'"></div>'+
+        '<div><label for="eq-v-'+r.id+'">'+(r.tipo==='externo'?'IVA':'IVA hotel y dietas')+'</label>'+
+          '<select data-campo="iva" id="eq-v-'+r.id+'">'+opcionesIva+'</select></div>'+
+      '</div>'+
+      '<p class="eq-nota"><b>'+etiqueta+'.</b> '+nota+'</p>'+
+    '</div>';
+  }).join('') : '<div class="vacio">Sin equipo técnico asignado a esta salida.</div>';
+  estado.eq.forEach(function(r){
+    var v=document.getElementById('eq-t-'+r.id); if(v) v.value=r.tipo;
+    var i=document.getElementById('eq-v-'+r.id); if(i) i.value=String(r.iva);
+  });
+
+  var cv=document.getElementById('filas-cv');
+  cv.innerHTML = estado.cv.length ? estado.cv.map(function(r){
+    return '<div class="fila fila-coste" data-lista="cv" data-id="'+r.id+'">'+
+      '<input type="text" data-campo="concepto" id="cv-c-'+r.id+'" value="'+esc(r.concepto)+'" placeholder="Concepto" aria-label="Concepto">'+
+      '<input type="text" inputmode="decimal" data-campo="importe" id="cv-i-'+r.id+'" value="'+eur.format(r.importe)+'" aria-label="Importe por persona">'+
+      '<select data-campo="iva" id="cv-v-'+r.id+'" aria-label="Tipo de IVA">'+opcionesIva+'</select>'+
+      '<span class="caja-incl"><input type="checkbox" data-campo="incl" id="cv-x-'+r.id+'" '+(r.incl?'checked':'')+' aria-label="Incluir en el paquete"></span>'+
+      '<button class="quitar" type="button" data-quitar aria-label="Quitar">&times;</button>'+
+    '</div>';
+  }).join('') : '<div class="vacio">Sin costes por participante.</div>';
+  estado.cv.forEach(function(r){ var s=document.getElementById('cv-v-'+r.id); if(s) s.value=String(r.iva); });
+
+  var op=document.getElementById('filas-op');
+  var modoPrecio=estado.modoCalculo==='precio';
+  op.innerHTML = estado.op.length ? estado.op.map(function(r){
+    return '<div class="fila fila-opcion" data-lista="op" data-id="'+r.id+'">'+
+      '<input type="text" data-campo="nombre" id="op-n-'+r.id+'" value="'+esc(r.nombre)+'" placeholder="Nombre de la opción" aria-label="Nombre de la opción">'+
+      '<input type="text" inputmode="decimal" data-campo="aloj" id="op-e-'+r.id+'" value="'+eur.format(r.aloj)+'" aria-label="Alojamiento por persona">'+
+      '<input type="text" inputmode="decimal" data-campo="comidas" id="op-c-'+r.id+'" value="'+eur.format(r.comidas)+'" aria-label="Comidas por persona">'+
+      '<select data-campo="iva" id="op-v-'+r.id+'" aria-label="Tipo de IVA">'+opcionesIva+'</select>'+
+      '<input type="text" inputmode="numeric" data-campo="personas" id="op-p-'+r.id+'" value="'+r.personas+'" aria-label="Personas">'+
+      '<span class="caja-incl"><input type="checkbox" data-campo="incl" id="op-x-'+r.id+'" '+(r.incl?'checked':'')+' aria-label="Incluir en el paquete"></span>'+
+      '<button class="quitar" type="button" data-quitar aria-label="Quitar">&times;</button>'+
+      (modoPrecio ? '<div style="grid-column:1/-1;display:flex;align-items:center;gap:9px;padding-top:2px">'+
+        '<label for="op-pv-'+r.id+'" style="margin:0;flex:none">PVP con IVA</label>'+
+        '<input type="text" inputmode="decimal" data-campo="precio" id="op-pv-'+r.id+'" value="'+(r.precio?eur.format(r.precio):'')+'" placeholder="Escribe el precio final" aria-label="Precio de venta con IVA" style="max-width:170px">'+
+      '</div>' : '')+
+    '</div>';
+  }).join('') : '<div class="vacio">Añade al menos una opción para calcular.</div>';
+  estado.op.forEach(function(r){ var s=document.getElementById('op-v-'+r.id); if(s) s.value=String(r.iva); });
+}
+
+/* ─────────── salidas ─────────── */
+function pintarSalidas(){
+  var c=calcular();
+
+  document.getElementById('sub-cf').textContent=money(c.cfBase);
+  var totEq=0; estado.eq.forEach(function(r){
+    totEq+=((r.tipo==='nomina'?0:r.importe)+r.alojamiento+r.dietas)*(r.pct/100);
+  });
+  document.getElementById('sub-eq').textContent=money(totEq);
+  document.getElementById('sub-cv').textContent=money(c.cvBase);
+  document.getElementById('sub-op').textContent=String(c.n);
+
+  /* panel de precios */
+  var po=document.getElementById('panel-opciones');
+  if(!c.opciones.length||c.n<=0){
+    po.innerHTML='<div class="res-opcion"><div class="res-nombre">Faltan datos</div>'+
+      '<div style="opacity:.7;font-size:13.5px;line-height:1.5">Añade una opción con al menos una persona para ver el precio.</div></div>';
+  } else {
+    po.innerHTML=c.opciones.map(function(o){
+      return '<div class="res-opcion">'+
+        '<div class="res-nombre">'+esc(o.nombre||'Opción sin nombre')+'</div>'+
+        '<div class="res-pvp">'+money(o.pvpIva)+'<small>'+o.personas+' pers.</small></div>'+
+        '<div class="res-detalle">'+
+          '<div><span>Coste</span><b>'+money(o.costePax)+'</b></div>'+
+          '<div><span>Margen</span><b>'+money(o.margenPax)+'</b></div>'+
+          '<div><span>Sobre venta</span><b>'+percent(o.margenPct)+'</b></div>'+
+        '</div>'+
+      '</div>';
+    }).join('');
+  }
+
+  /* métricas */
+  var pmTexto, pmPie;
+  if(c.cfBase<=0){ pmTexto='—'; pmPie='Sin costes fijos: cada persona aporta margen desde la primera.'; }
+  else if(!isFinite(c.puntoMuerto)){ pmTexto='—'; pmPie='Con estos precios los costes fijos no se recuperan nunca.'; }
+  else { pmTexto=String(c.puntoMuerto)+' pers.'; pmPie='Por debajo de aquí la salida pierde dinero.'; }
+
+  var jorTexto = c.jornadas>0
+    ? (c.jornadas===Math.round(c.jornadas)?c.jornadas:c.jornadas.toFixed(1).replace('.',','))+
+      (c.jornadas===1?' jornada de técnico':' jornadas de técnico')
+    : 'sin jornadas declaradas';
+
+  document.getElementById('panel-metricas').innerHTML=
+    '<div class="metrica destacada"><span class="eyebrow">Margen de la actividad</span>'+
+      '<div class="cifra">'+money(c.margenTot)+'</div>'+
+      '<div class="pie">'+percent(c.margenPct)+' sobre ventas</div></div>'+
+    '<div class="metrica destacada"><span class="eyebrow">Mínimo para no perder</span>'+
+      '<div class="cifra">'+pmTexto+'</div><div class="pie">'+pmPie+'</div></div>'+
+    '<div class="metrica"><span class="eyebrow">Facturación sin IVA</span>'+
+      '<div class="cifra">'+money(c.ingresosBase)+'</div>'+
+      '<div class="pie">Se cobra '+money(c.cobroTotal)+' con IVA</div></div>'+
+    '<div class="metrica"><span class="eyebrow">Coste total</span>'+
+      '<div class="cifra">'+money(c.costesTot)+'</div>'+
+      '<div class="pie">'+money(c.cfBase)+' fijos · '+money(c.costesTot-c.cfBase)+' variables</div></div>'+
+    (c.jornadas>0
+      ? '<div class="metrica destacada" style="grid-column:1/-1"><span class="eyebrow">Deja por jornada de técnico</span>'+
+        '<div class="cifra">'+money(c.contribJornada)+'</div>'+
+        '<div class="pie">La salida se come '+jorTexto+'. Con esta cifra se comparan actividades entre sí: el recurso escaso son los días de técnico, no el dinero.</div></div>'
+      : '');
+
+  /* avisos */
+  var avisos=[];
+  if(estado.eq.length>0 && c.jornadas<=0){
+    avisos.push('<div class="aviso"><span class="marca"></span><div><b>Faltan las jornadas.</b> Hay equipo en la salida pero nadie tiene días declarados, así que no se puede saber cuánto deja la actividad por jornada de técnico, que es la cifra con la que se comparan unas salidas con otras.</div></div>');
+  }
+  if(c.n>0&&isFinite(c.puntoMuerto)&&c.puntoMuerto>c.n){
+    avisos.push('<div class="aviso severo"><span class="marca"></span><div><b>La actividad no sale.</b> Necesitas '+c.puntoMuerto+
+      ' personas para cubrir los costes fijos y solo cuentas con '+c.n+'. Sube el precio, recorta coste fijo o no la abras.</div></div>');
+  } else if(isFinite(c.margenPct)&&c.margenPct<0.204&&c.margenPct>=0){
+    avisos.push('<div class="aviso"><span class="marca"></span><div><b>Por debajo de la referencia.</b> '+percent(c.margenPct)+
+      ' está por debajo del 20,4 % que dio Actividades NW en el semestre. Es una decisión válida, pero conviene que sea consciente.</div></div>');
+  }
+  if(c.n>0&&isFinite(c.puntoMuerto)&&c.puntoMuerto<=c.n&&c.puntoMuerto>0){
+    var colchon=c.n-c.puntoMuerto;
+    avisos.push('<div class="aviso"><span class="marca"></span><div><b>Colchón de '+colchon+
+      (colchon===1?' persona':' personas')+'.</b> Se pueden caer '+colchon+' sin entrar en pérdidas. Cierre de inscripción con ese número como mínimo viable.</div></div>');
+  }
+  document.getElementById('panel-avisos').innerHTML=avisos.join('');
+
+  /* sensibilidad */
+  var cuerpo=document.querySelector('#tabla-sensibilidad tbody');
+  if(c.n<=0){
+    cuerpo.innerHTML='<tr><td colspan="6" style="text-align:left;color:var(--texto-sec)">Añade participantes para ver el escenario.</td></tr>';
+  } else {
+    var candidatos=[c.n,c.n-2,c.n-4,c.n-6,c.n-8,c.n+2,c.n+4];
+    if(isFinite(c.puntoMuerto)&&c.puntoMuerto>0) candidatos.push(c.puntoMuerto);
+    var vistos={}, lista=[];
+    candidatos.forEach(function(v){ if(v>0&&!vistos[v]){ vistos[v]=1; lista.push(v); } });
+    lista.sort(function(a,b){ return a-b; });
+    lista=lista.slice(0,9);
+
+    var maxAbs=1;
+    var datos=lista.map(function(v){ var r=margenA(v,c); if(Math.abs(r.margen)>maxAbs) maxAbs=Math.abs(r.margen); return {n:v,r:r}; });
+
+    cuerpo.innerHTML=datos.map(function(d){
+      var clases=[];
+      if(d.n===c.n) clases.push('previsto');
+      if(d.r.margen<0) clases.push('bajo');
+      var ancho=Math.max(2,Math.round(Math.abs(d.r.margen)/maxAbs*100));
+      var etiqueta = d.n===c.n ? ' <span class="chip">Previsto</span>'
+        : (isFinite(c.puntoMuerto)&&d.n===c.puntoMuerto ? ' <span class="chip fuerte">Mínimo</span>' : '');
+      return '<tr class="'+clases.join(' ')+'"><td>'+d.n+etiqueta+'</td>'+
+        '<td>'+money(d.r.costePax)+'</td>'+
+        '<td>'+money(d.r.margenPax)+'</td>'+
+        '<td>'+money(d.r.margen)+'</td>'+
+        '<td>'+percent(d.r.pct)+'</td>'+
+        '<td class="celda-barra"><span class="barra'+(d.r.margen<0?' negativa':'')+'" style="width:'+ancho+'%"></span></td></tr>';
+    }).join('');
+  }
+
+  /* IVA */
+  document.querySelector('#tabla-iva tbody').innerHTML=
+    '<tr><td>IVA soportado en compras</td><td>'+money(c.ivaSoportado)+'</td></tr>'+
+    '<tr><td>IVA repercutido al cliente ('+pct.format(estado.ivaVenta)+' %)</td><td>'+money(c.ivaRepercutido)+'</td></tr>'+
+    '<tr><td><b>A ingresar en Hacienda</b></td><td><b>'+money(c.ivaLiquidar)+'</b></td></tr>'+
+    '<tr><td>Se cobra al cliente (IVA incluido)</td><td>'+money(c.cobroTotal)+'</td></tr>';
+
+  var eqv=document.getElementById('equiv-margen');
+  if(estado.modoCalculo==='margen'){
+    var m=estado.margen/100;
+    if(estado.baseMargen==='ventas'){
+      var mult=m<1?1/(1-m):NaN;
+      eqv.innerHTML='Un <b>'+pct.format(estado.margen)+' %</b> sobre el precio de venta es multiplicar el coste por <b>'+
+        (isFinite(mult)?mult.toFixed(2).replace('.',','):'—')+'</b>. Ese es el número que puedes usar de cabeza.';
+    } else {
+      eqv.innerHTML='Un <b>'+pct.format(estado.margen)+' %</b> sobre el coste deja <b>'+percent(m/(1+m))+
+        '</b> sobre el precio de venta, que es el número que se compara con el 20,4 % de ANW. Siempre sale menos de lo que parece.';
+    }
+    eqv.hidden=false;
+  } else { eqv.hidden=true; }
+
+  pintarDesglose(c);
+
+  /* paquete */
+  document.getElementById('salida-paquete').textContent=construirPaquete(c);
+  ultimoCalculo=c;
+}
+
+function pintarDesglose(c){
+  var h='';
+
+  h+='<div class="desglose-grupo"><div class="desglose-cab">'+
+     '<span class="tit"><span class="tipo-chip fijo">Fijo</span>Se paga entero y se reparte</span>'+
+     '<b>'+money(c.cfBase)+'</b></div>';
+  if(!c.cfDetalle.length){
+    h+='<div class="desglose-linea"><span class="concepto" style="color:var(--texto-sec)">Esta actividad no tiene costes fijos</span></div>';
+  } else {
+    c.cfDetalle.forEach(function(d){
+      var marca='', calc='';
+      if(d.unidades>1){
+        marca='<span class="escalon">× '+d.unidades+' unidades</span>';
+        calc=money(d.importe)+' × '+d.unidades+'  =  ';
+      } else if(d.tipo){
+        if(d.jornadas>0){
+          var j=d.jornadas===Math.round(d.jornadas)?d.jornadas:d.jornadas.toFixed(1).replace('.',',');
+          marca='<span class="escalon">'+j+(d.jornadas===1?' jornada':' jornadas')+'</span>';
+        }
+        if(d.extra>0&&d.gastos>0) calc=money(d.gastos)+' + '+money(d.extra)+'  =  ';
+      }
+      h+='<div class="desglose-linea"><span class="concepto">'+esc(d.concepto||'Sin concepto')+marca+'</span>'+
+         '<span class="calc">'+calc+money(d.total)+'</span></div>';
+    });
+  }
+  h+='</div>';
+
+  var totalVar=c.costesTot-c.cfBase;
+  h+='<div class="desglose-grupo"><div class="desglose-cab">'+
+     '<span class="tit"><span class="tipo-chip variable">Variable</span>Se multiplica por cada participante</span>'+
+     '<b>'+money(totalVar)+'</b></div>';
+  var hayVar=false;
+  estado.cv.forEach(function(r){
+    if(!r.concepto&&!r.importe) return;
+    hayVar=true;
+    h+='<div class="desglose-linea"><span class="concepto">'+esc(r.concepto||'Sin concepto')+'</span>'+
+       '<span class="calc">'+money(r.importe)+' × '+c.n+' pers.  =  '+money(r.importe*c.n)+'</span></div>';
+  });
+  c.opciones.forEach(function(o){
+    if(!o.nombre&&!o.aloj&&!o.comidas) return;
+    var nombre=esc(o.nombre||'Paquete sin nombre');
+    [{et:'alojamiento',v:o.aloj},{et:'comidas',v:o.comidas}].forEach(function(p){
+      if(p.v<=0) return;
+      hayVar=true;
+      h+='<div class="desglose-linea"><span class="concepto">'+nombre+
+         ' <span style="color:var(--texto-sec)">· '+p.et+'</span></span>'+
+         '<span class="calc">'+money(p.v)+' × '+o.personas+' pers.  =  '+money(p.v*o.personas)+'</span></div>';
+    });
+  });
+  if(!hayVar){
+    h+='<div class="desglose-linea"><span class="concepto" style="color:var(--texto-sec)">Esta actividad no tiene costes variables</span></div>';
+  }
+  h+='</div>';
+
+  h+='<div class="desglose-grupo"><div class="desglose-cab" style="border-bottom:none;margin-bottom:0">'+
+     '<span class="tit">Coste total de la actividad</span><b>'+money(c.costesTot)+'</b></div></div>';
+
+  document.getElementById('desglose').innerHTML=h;
+}
+
+var ultimoCalculo=null;
+
+function construirPaquete(c){
+  var L=[];
+  var titulo=estado.nombre||'Actividad sin nombre';
+  L.push(titulo.toUpperCase());
+  var sub=[];
+  if(estado.lugar) sub.push(estado.lugar);
+  if(estado.fechas) sub.push(estado.fechas);
+  if(sub.length) L.push(sub.join(' · '));
+  L.push('');
+
+  if(c.opciones.length&&c.n>0){
+    c.opciones.forEach(function(o){
+      L.push((o.nombre||'Opción')+': '+money(o.pvpIva)+' por persona, IVA incluido');
+    });
+    L.push('');
+  }
+
+  var incluye=[];
+  estado.cf.forEach(function(r){ if(r.incl&&r.concepto) incluye.push(r.concepto); });
+  estado.cv.forEach(function(r){ if(r.incl&&r.concepto) incluye.push(r.concepto); });
+  var opIncl=estado.op.filter(function(o){ return o.incl; });
+  if(opIncl.length===1){
+    if(opIncl[0].aloj>0) incluye.push(opIncl[0].nombre||'Alojamiento');
+    if(opIncl[0].comidas>0) incluye.push('Comidas');
+  } else if(opIncl.length>1){
+    if(opIncl.some(function(o){ return o.aloj>0; })) incluye.push('Alojamiento según el paquete elegido');
+    if(opIncl.some(function(o){ return o.comidas>0; })) incluye.push('Comidas según el paquete elegido');
+  }
+  if(estado.eq.length) incluye.push('Acompañamiento técnico de Bendhora durante toda la salida');
+
+  if(incluye.length){
+    L.push('INCLUYE');
+    incluye.forEach(function(t){ L.push('· '+t); });
+    L.push('');
+  }
+
+  var noIncluye=[];
+  estado.cf.forEach(function(r){ if(!r.incl&&r.concepto) noIncluye.push(r.concepto); });
+  estado.cv.forEach(function(r){ if(!r.incl&&r.concepto) noIncluye.push(r.concepto); });
+  if(noIncluye.length){
+    L.push('NO INCLUYE');
+    noIncluye.forEach(function(t){ L.push('· '+t); });
+    L.push('');
+  }
+
+  if(c.n>0) L.push('Plazas: '+c.n);
+  if(isFinite(c.puntoMuerto)&&c.puntoMuerto>0){
+    L.push('La salida se confirma a partir de '+c.puntoMuerto+' inscripciones.');
+  }
+  if(estado.limite) L.push('Inscripción hasta el '+estado.limite+'.');
+
+  L.push('');
+  L.push('— — —');
+  L.push('Borrador para que Sergi le dé el tono. Los datos y los precios ya están comprobados.');
+
+  return L.join('\n');
+}
+
+function resumenInterno(c){
+  var L=[];
+  L.push('RESUMEN INTERNO · '+(estado.nombre||'Actividad'));
+  L.push('No enviar al cliente.');
+  L.push('');
+  L.push('Participantes previstos: '+c.n);
+  L.push('Costes fijos: '+money(c.cfBase));
+  L.push('Coste variable por persona (base común): '+money(c.cvBase));
+  L.push('');
+  c.opciones.forEach(function(o){
+    L.push((o.nombre||'Opción')+' — '+o.personas+' pers.');
+    L.push('   Coste/pers. '+money(o.costePax)+' · PVP '+money(o.pvpIva)+' con IVA · margen '+money(o.margenPax)+' ('+percent(o.margenPct)+')');
+  });
+  L.push('');
+  L.push('Facturación sin IVA: '+money(c.ingresosBase));
+  L.push('Coste total: '+money(c.costesTot));
+  L.push('Margen de la actividad: '+money(c.margenTot)+' ('+percent(c.margenPct)+' sobre ventas)');
+  if(c.jornadas>0){
+    L.push('Contribución por jornada de técnico: '+money(c.contribJornada)+' sobre '+c.jornadas+' jornadas');
+  }
+  L.push('Referencia ANW 1er semestre 2026: 20,4 %');
+  L.push('');
+  L.push('Mínimo viable: '+(isFinite(c.puntoMuerto)&&c.puntoMuerto>0?c.puntoMuerto+' personas':'no aplica'));
+  L.push('');
+  L.push('IVA (memorándum de tesorería, no es gasto)');
+  L.push('   Soportado '+money(c.ivaSoportado)+' · repercutido '+money(c.ivaRepercutido)+' · a ingresar '+money(c.ivaLiquidar));
+  L.push('');
+  L.push('Pendiente de confirmar con la gestoría: régimen general frente a régimen especial de agencias de viajes.');
+  L.push('La jornada ordinaria de plantilla no entra como coste: ya está repartida por línea');
+  L.push('en el cuadrante de dedicación (D12). Aquí solo entra lo que se paga de más por esta salida.');
+  return L.join('\n');
+}
+
+/* ─────────── eventos ─────────── */
+function buscar(lista,id){
+  var a=estado[lista];
+  for(var i=0;i<a.length;i++) if(a[i].id===id) return a[i];
+  return null;
+}
+
+document.addEventListener('input',function(e){
+  var t=e.target;
+  var fila=t.closest?t.closest('.fila'):null;
+  if(fila){
+    var reg=buscar(fila.dataset.lista,fila.dataset.id);
+    if(!reg) return;
+    var campo=t.dataset.campo;
+    if(!campo) return;
+    if(campo==='concepto'||campo==='nombre') reg[campo]=t.value;
+    else if(campo==='personas'||campo==='capacidad') reg[campo]=Math.max(0,Math.round(parseNum(t.value)));
+    else if(campo==='pct') reg.pct=Math.min(100,Math.max(0,Math.round(parseNum(t.value))));
+    else if(campo==='incl') reg.incl=t.checked;
+    else if(campo==='vinculo') return;
+    else reg[campo]=parseNum(t.value);
+    pintarSalidas();
+    return;
+  }
+  switch(t.id){
+    case 'f-nombre': estado.nombre=t.value; break;
+    case 'f-lugar': estado.lugar=t.value; break;
+    case 'f-fechas': estado.fechas=t.value; break;
+    case 'f-fecha': estado.fecha=t.value; break;
+    case 'f-limite': estado.limite=t.value; break;
+    case 'f-margen': estado.margen=parseNum(t.value); break;
+    case 'f-iva': estado.ivaVenta=parseNum(t.value); break;
+    default: return;
+  }
+  pintarSalidas();
+});
+
+document.addEventListener('change',function(e){
+  var t=e.target;
+  var fila=t.closest?t.closest('.fila'):null;
+  if(fila&&t.dataset.campo){
+    var reg=buscar(fila.dataset.lista,fila.dataset.id);
+    if(!reg) return;
+    if(t.dataset.campo==='iva'){ reg.iva=parseNum(t.value); pintarSalidas(); return; }
+    if(t.dataset.campo==='tipo'){
+      reg.tipo=t.value;
+      if(t.value==='nomina') reg.importe=0;
+      pintarFilas(); pintarSalidas(); return;
+    }
+    return;
+  }
+  if(t.id==='f-tipo'){
+    estado.tipo=t.value;
+    var sugerido={competicion:26,finde:25,dia:30,otro:25}[t.value];
+    if(sugerido&&estado.baseMargen==='ventas'){
+      estado.margen=sugerido;
+      document.getElementById('f-margen').value=String(sugerido);
+    }
+    pintarSalidas();
+  }
+  if(t.id==='f-redondeo'){ estado.redondeo=parseNum(t.value); pintarSalidas(); }
+});
+
+document.addEventListener('click',function(e){
+  var t=e.target;
+
+  if(!t||!t.matches) return;
+
+  if(t.matches('[data-quitar]')){
+    var fila=t.closest('.fila');
+    var lista=fila.dataset.lista, id=fila.dataset.id;
+    estado[lista]=estado[lista].filter(function(r){ return r.id!==id; });
+    pintarFilas(); pintarSalidas(); return;
+  }
+
+  var anadir=t.dataset?t.dataset.anadir:null;
+  if(anadir){
+    if(anadir==='cf') estado.cf.push({id:nextId(),concepto:'',importe:0,iva:21,incl:true,capacidad:0});
+    if(anadir==='cv') estado.cv.push({id:nextId(),concepto:'',importe:0,iva:21,incl:true});
+    if(anadir==='eq') estado.eq.push({id:nextId(),nombre:'',tipo:'nomina',jornadas:1,pct:100,importe:0,alojamiento:0,dietas:0,iva:10});
+    if(anadir==='op') estado.op.push({id:nextId(),nombre:'',aloj:0,comidas:0,iva:10,personas:0,incl:true,precio:0});
+    pintarFilas(); pintarSalidas(); return;
+  }
+
+  if(t.dataset&&t.dataset.calculo){
+    estado.modoCalculo=t.dataset.calculo;
+    document.querySelectorAll('#seg-calculo button').forEach(function(b){
+      b.setAttribute('aria-pressed', b.dataset.calculo===estado.modoCalculo ? 'true':'false');
+    });
+    var esMargen=estado.modoCalculo==='margen';
+    document.getElementById('bloque-margen').hidden=!esMargen;
+    document.getElementById('campo-margen').hidden=!esMargen;
+    pintarFilas(); pintarSalidas(); return;
+  }
+
+  if(t.dataset&&t.dataset.base){
+    estado.baseMargen=t.dataset.base;
+    document.querySelectorAll('#seg-base button').forEach(function(b){
+      b.setAttribute('aria-pressed', b.dataset.base===estado.baseMargen ? 'true':'false');
+    });
+    pintarSalidas(); return;
+  }
+
+  if(t.id==='btn-copiar') copiar(construirPaquete(ultimoCalculo||calcular()), t, 'Copiar paquete');
+  if(t.id==='btn-copiar-interno') copiar(resumenInterno(ultimoCalculo||calcular()), t, 'Copiar resumen interno');
+});
+
+function copiar(texto,boton,original){
+  var hecho=function(){
+    boton.textContent='Copiado';
+    setTimeout(function(){ boton.textContent=original; },1600);
+  };
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(texto).then(hecho,function(){ respaldo(texto,hecho); });
+  } else respaldo(texto,hecho);
+}
+function respaldo(texto,hecho){
+  var a=document.createElement('textarea');
+  a.value=texto; a.style.position='fixed'; a.style.opacity='0';
+  document.body.appendChild(a); a.select();
+  try{ document.execCommand('copy'); hecho(); }catch(err){}
+  document.body.removeChild(a);
+}
+
+/* ─────────── registro de actividades (navegador) ─────────── */
+var CLAVE='na-bdh-actividades-v1';
+var registro=[], actualId=null, cerrandoId=null, borrandoId=null;
+
+function leerRegistro(){
+  try{
+    var crudo=localStorage.getItem(CLAVE);
+    registro=crudo?JSON.parse(crudo):[];
+    if(!Array.isArray(registro)) registro=[];
+  }catch(e){ registro=[]; }
+}
+function escribirRegistro(){
+  try{ localStorage.setItem(CLAVE, JSON.stringify(registro)); return true; }
+  catch(e){ return false; }
+}
+function buscarReg(id){
+  for(var i=0;i<registro.length;i++) if(registro[i].id===id) return registro[i];
+  return null;
+}
+/* Ejecuta fn leyendo un estado guardado en vez del actual, para recalcular
+   una actividad del histórico sin tocar lo que hay en pantalla. */
+function conEstado(datos, fn){
+  var previo=estado;
+  estado=datos;
+  try{ return fn(); } finally { estado=previo; }
+}
+
+function instantanea(){
+  var c=calcular();
+  return {
+    datos:{
+      nombre:estado.nombre, lugar:estado.lugar, fechas:estado.fechas, fecha:estado.fecha,
+      tipo:estado.tipo, limite:estado.limite,
+      cf:estado.cf, eq:estado.eq, cv:estado.cv, op:estado.op,
+      modoCalculo:estado.modoCalculo, baseMargen:estado.baseMargen,
+      margen:estado.margen, ivaVenta:estado.ivaVenta, redondeo:estado.redondeo
+    },
+    previsto:{
+      participantes:c.n, ingresos:c.ingresosBase, costes:c.costesTot,
+      cfBase:c.cfBase, cvTotal:c.costesTot-c.cfBase,
+      margen:c.margenTot, margenPct:c.margenPct,
+      puntoMuerto:isFinite(c.puntoMuerto)?c.puntoMuerto:null,
+      jornadas:c.jornadas, contribJornada:c.contribJornada
+    }
+  };
+}
+
+function calcularReal(r){
+  if(!r.cierre) return null;
+  return conEstado(r.datos, function(){
+    var c=calcular();
+    var m=margenA(r.cierre.participantes, c);
+    return {
+      participantes:r.cierre.participantes,
+      ingresos:m.ingresos, costes:m.costes, cfBase:m.cfBase, cvTotal:m.cvTotal,
+      margen:m.margen, margenPct:m.pct, margenPax:m.margenPax, costePax:m.costePax
+    };
+  });
+}
+
+function guardarActividad(){
+  var snap=instantanea();
+  var ahora=new Date().toISOString();
+  var r=actualId?buscarReg(actualId):null;
+  if(r){
+    r.datos=snap.datos; r.previsto=snap.previsto; r.actualizada=ahora;
+    if(r.estado==='cerrada') r.real=calcularReal(r);
+  } else {
+    r={ id:'a'+Date.now().toString(36)+Math.floor(Math.random()*1000),
+        estado:'prevista', datos:snap.datos, previsto:snap.previsto,
+        cierre:null, real:null, creada:ahora, actualizada:ahora };
+    registro.unshift(r);
+    actualId=r.id;
+  }
+  var ok=escribirRegistro();
+  pintarRegistro();
+  return ok;
+}
+
+function cerrarActividad(id, participantes, notas){
+  var r=buscarReg(id); if(!r) return;
+  r.cierre={ participantes:participantes, notas:notas||'', fecha:new Date().toISOString() };
+  r.real=calcularReal(r);
+  r.estado='cerrada';
+  r.actualizada=new Date().toISOString();
+  escribirRegistro(); pintarRegistro();
+}
+
+function reabrirActividad(id){
+  var r=buscarReg(id); if(!r) return;
+  r.estado='prevista'; r.cierre=null; r.real=null;
+  r.actualizada=new Date().toISOString();
+  escribirRegistro(); pintarRegistro();
+}
+
+function fechaDe(r){
+  var f=r.datos&&r.datos.fecha?new Date(r.datos.fecha+'T00:00:00'):new Date(r.creada);
+  return isNaN(f.getTime())?null:f;
+}
+function enPeriodo(r, periodo){
+  if(periodo==='todas') return true;
+  var f=fechaDe(r); if(!f) return true;
+  var hoy=new Date();
+  if(f.getFullYear()!==hoy.getFullYear()) return false;
+  if(periodo==='anio') return true;
+  var m=f.getMonth(), mh=hoy.getMonth();
+  if(periodo==='mes') return m===mh;
+  if(periodo==='trimestre') return Math.floor(m/3)===Math.floor(mh/3);
+  if(periodo==='semestre') return Math.floor(m/6)===Math.floor(mh/6);
+  return true;
+}
+function filtradas(){
+  var per=document.getElementById('f-periodo').value;
+  var est=document.getElementById('f-filtro-estado').value;
+  return registro.filter(function(r){
+    if(!enPeriodo(r,per)) return false;
+    if(est!=='todas'&&r.estado!==est) return false;
+    return true;
+  });
+}
+/* La cifra que cuenta: si está cerrada manda lo real, si no lo previsto. */
+function vigente(r){ return (r.estado==='cerrada'&&r.real)?r.real:(r.previsto||{}); }
+
+function pintarRegistro(){
+  var lista=filtradas();
+  var cont=document.getElementById('lista-registro');
+
+  var tot={n:0, participantes:0, ingresos:0, costes:0, margen:0, cerradas:0};
+  lista.forEach(function(r){
+    var v=vigente(r);
+    tot.n++;
+    if(r.estado==='cerrada') tot.cerradas++;
+    if(isFinite(v.participantes)) tot.participantes+=v.participantes;
+    if(isFinite(v.ingresos)) tot.ingresos+=v.ingresos;
+    if(isFinite(v.costes)) tot.costes+=v.costes;
+    if(isFinite(v.margen)) tot.margen+=v.margen;
+  });
+
+  document.getElementById('registro-cifras').innerHTML=
+    '<div><span>Actividades</span><b>'+tot.n+(tot.cerradas?' · '+tot.cerradas+' cerradas':'')+'</b></div>'+
+    '<div><span>Participantes</span><b>'+tot.participantes+'</b></div>'+
+    '<div><span>Facturación sin IVA</span><b>'+money(tot.ingresos)+'</b></div>'+
+    '<div><span>Coste</span><b>'+money(tot.costes)+'</b></div>'+
+    '<div><span>Margen</span><b>'+money(tot.margen)+'</b></div>'+
+    '<div><span>Rentabilidad</span><b>'+(tot.ingresos>0?percent(tot.margen/tot.ingresos):'—')+'</b></div>';
+
+  if(!lista.length){
+    cont.innerHTML='<div class="vacio">'+(registro.length
+      ? 'Ninguna actividad en este periodo. Cambia el filtro para verlas todas.'
+      : 'Todavía no has guardado ninguna actividad. Rellena la calculadora y pulsa «Guardar actividad».')+'</div>';
+  } else {
+    cont.innerHTML=lista.map(function(r){
+      var v=vigente(r), cerrada=r.estado==='cerrada';
+      var f=fechaDe(r);
+      var meta=[];
+      if(f) meta.push(f.toLocaleDateString('es-ES'));
+      if(r.datos.lugar) meta.push(esc(r.datos.lugar));
+      meta.push((cerrada?'fueron ':'previstos ')+(v.participantes||0)+' pers.');
+      meta.push('margen '+money(v.margen)+' ('+percent(cerrada?v.margenPct:v.margenPct)+')');
+      if(cerrada&&r.previsto&&isFinite(r.previsto.margen)){
+        var dif=v.margen-r.previsto.margen;
+        meta.push((dif>=0?'+':'−')+money(Math.abs(dif))+' frente a lo previsto');
+      }
+      var acc = cerrada
+        ? '<button class="mini" type="button" data-abrir="'+r.id+'">Abrir</button>'+
+          '<button class="mini" type="button" data-reabrir="'+r.id+'">Reabrir</button>'
+        : '<button class="mini" type="button" data-abrir="'+r.id+'">Abrir</button>'+
+          '<button class="mini" type="button" data-cerrar="'+r.id+'">Cerrar</button>';
+      acc+='<button class="mini" type="button" data-borrar="'+r.id+'">'+
+           (borrandoId===r.id?'¿Seguro?':'Borrar')+'</button>';
+
+      var form='';
+      if(cerrandoId===r.id){
+        form='<div class="cierre-form">'+
+          '<div><label for="cierre-n-'+r.id+'">Participantes reales</label>'+
+            '<input type="text" inputmode="numeric" id="cierre-n-'+r.id+'" value="'+(r.previsto.participantes||0)+'"></div>'+
+          '<div style="flex:2"><label for="cierre-t-'+r.id+'">Notas (opcional)</label>'+
+            '<input type="text" id="cierre-t-'+r.id+'" placeholder="Se cayeron dos por la lluvia"></div>'+
+          '<div class="cierre-acc">'+
+            '<button class="btn" type="button" data-confirmar="'+r.id+'">Cerrar</button>'+
+            '<button class="btn suave" type="button" data-cancelar="1">Cancelar</button>'+
+          '</div></div>';
+      }
+
+      return '<div class="escenario'+(cerrada?' cerrada':'')+'">'+
+        '<div class="escenario-datos"><div class="titulo">'+esc(r.datos.nombre||'Sin nombre')+
+          (cerrada?' <span class="chip">Cerrada</span>':' <span class="chip apagado">Prevista</span>')+
+          (actualId===r.id?' <span class="chip apagado">En edición</span>':'')+'</div>'+
+          '<div class="meta">'+meta.join(' · ')+'</div></div>'+
+        '<div class="escenario-acc">'+acc+'</div>'+form+
+      '</div>';
+    }).join('');
+  }
+
+  var banner=document.getElementById('aviso-edicion');
+  var act=actualId?buscarReg(actualId):null;
+  banner.innerHTML=act
+    ? '<div class="avisoEdicion"><div>Lo que hay en la calculadora se guardará sobre <b>'+
+      esc(act.datos.nombre||'Sin nombre')+'</b>.</div>'+
+      '<button class="mini" type="button" id="btn-soltar">Desvincular</button></div>'
+    : '';
+}
+
+function cargar(d){
+  ['nombre','lugar','fechas','fecha','tipo','limite','modoCalculo','baseMargen','margen','ivaVenta','redondeo'].forEach(function(k){
+    if(d[k]!==undefined) estado[k]=d[k];
+  });
+  ['cf','eq','cv','op'].forEach(function(k){
+    if(Array.isArray(d[k])) estado[k]=d[k].map(function(r){
+      var copia={}; for(var p in r) copia[p]=r[p];
+      copia.id=nextId(); return copia;
+    });
+  });
+  /* actividades guardadas antes de que existieran el aforo y la imputación de horas */
+  estado.cf.forEach(function(r){ if(r.capacidad===undefined) r.capacidad=0; });
+  estado.op.forEach(function(r){
+    if(r.aloj===undefined) r.aloj=(r.extra||0);
+    if(r.comidas===undefined) r.comidas=0;
+    delete r.extra;
+  });
+  estado.eq.forEach(function(r){
+    if(r.tipo===undefined) r.tipo=(r.vinculo==='externo')?'externo':'nomina';
+    if(r.importe===undefined) r.importe=(r.personal!==undefined?r.personal:(r.honorarios||0));
+    if(r.jornadas===undefined) r.jornadas=1;
+    if(r.pct===undefined) r.pct=(r.imputa!==undefined?r.imputa:100);
+    delete r.vinculo; delete r.personal; delete r.honorarios; delete r.imputa;
+  });
+  document.getElementById('f-nombre').value=estado.nombre||'';
+  document.getElementById('f-lugar').value=estado.lugar||'';
+  document.getElementById('f-fecha').value=estado.fecha||'';
+  document.getElementById('f-fechas').value=estado.fechas||'';
+  document.getElementById('f-limite').value=estado.limite||'';
+  document.getElementById('f-tipo').value=estado.tipo||'otro';
+  document.getElementById('f-margen').value=String(estado.margen);
+  document.getElementById('f-iva').value=String(estado.ivaVenta);
+  document.getElementById('f-redondeo').value=String(estado.redondeo);
+  document.querySelectorAll('#seg-calculo button').forEach(function(b){
+    b.setAttribute('aria-pressed', b.dataset.calculo===estado.modoCalculo?'true':'false');
+  });
+  document.querySelectorAll('#seg-base button').forEach(function(b){
+    b.setAttribute('aria-pressed', b.dataset.base===estado.baseMargen?'true':'false');
+  });
+  var esMargen=estado.modoCalculo==='margen';
+  document.getElementById('bloque-margen').hidden=!esMargen;
+  document.getElementById('campo-margen').hidden=!esMargen;
+  pintarFilas(); pintarSalidas();
+}
+
+/* ─────────── exportación ─────────── */
+function csvNum(v){
+  if(v==null||!isFinite(v)) return '';
+  return String(Math.round(v*100)/100).replace('.',',');
+}
+function csvTxt(s){
+  s=String(s==null?'':s);
+  return /[;"\n\r]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s;
+}
+function listadoCSV(lista){
+  var sep=';';
+  var filas=[[
+    'Actividad','Lugar','Día','Tipo','Estado',
+    'Participantes previstos','Participantes reales',
+    'Facturación sin IVA','Costes fijos','Costes variables','Coste total',
+    'Margen','% sobre ventas','Jornadas de técnico','Margen por jornada',
+    'Punto muerto','Fecha de cierre','Notas'
+  ].join(sep)];
+  var tipos={competicion:'Competición',finde:'Fin de semana',dia:'Excursión de día',otro:'Otro'};
+  lista.forEach(function(r){
+    var p=r.previsto||{}, v=vigente(r), cerrada=r.estado==='cerrada';
+    filas.push([
+      csvTxt(r.datos.nombre), csvTxt(r.datos.lugar), r.datos.fecha||'',
+      tipos[r.datos.tipo]||r.datos.tipo||'', cerrada?'Cerrada':'Prevista',
+      csvNum(p.participantes), cerrada?csvNum(v.participantes):'',
+      csvNum(v.ingresos), csvNum(v.cfBase), csvNum(v.cvTotal), csvNum(v.costes),
+      csvNum(v.margen), csvNum((v.margenPct||0)*100),
+      csvNum(p.jornadas), p.jornadas>0?csvNum(v.margen/p.jornadas):'',
+      p.puntoMuerto!=null?p.puntoMuerto:'',
+      r.cierre?r.cierre.fecha.slice(0,10):'', csvTxt(r.cierre?r.cierre.notas:'')
+    ].join(sep));
+  });
+  return '﻿'+filas.join('\r\n');
+}
+
+function descargar(nombre, contenido, mime){
+  var blob=new Blob([contenido],{type:mime});
+  function directa(){
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    a.href=url; a.download=nombre;
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); },2000);
+  }
+  if(window.claude&&window.claude.use){
+    window.claude.use('downloads').then(function(d){
+      if(!d){ directa(); return; }
+      d.save({filename:nombre, data:blob}).catch(function(err){
+        if(!err||err.code!=='declined') directa();
+      });
+    }).catch(directa);
+  } else directa();
+}
+
+function marcaTiempo(){
+  var d=new Date(), z=function(n){ return (n<10?'0':'')+n; };
+  return d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate());
+}
+
+function avisoBoton(btn, texto, original){
+  btn.textContent=texto;
+  setTimeout(function(){ btn.textContent=original; },1800);
+}
+
+/* ─────────── acciones del registro ─────────── */
+document.addEventListener('click',function(e){
+  var t=e.target;
+  if(!t||!t.dataset) return;
+
+  if(t.id==='btn-guardar'){
+    var nuevo=!actualId;
+    var ok=guardarActividad();
+    avisoBoton(t, ok?(nuevo?'Guardada':'Actualizada'):'No se pudo guardar', 'Guardar actividad');
+    return;
+  }
+  if(t.id==='btn-nueva'||t.id==='btn-soltar'){
+    actualId=null; cerrandoId=null; borrandoId=null;
+    pintarRegistro();
+    return;
+  }
+  if(t.dataset.abrir){
+    var r=buscarReg(t.dataset.abrir);
+    if(r){ actualId=r.id; cerrandoId=null; borrandoId=null; cargar(r.datos); pintarRegistro();
+           document.getElementById('f-nombre').scrollIntoView({block:'center'}); }
+    return;
+  }
+  if(t.dataset.cerrar){ cerrandoId=t.dataset.cerrar; borrandoId=null; pintarRegistro(); return; }
+  if(t.dataset.cancelar){ cerrandoId=null; pintarRegistro(); return; }
+  if(t.dataset.confirmar){
+    var id=t.dataset.confirmar;
+    var campoN=document.getElementById('cierre-n-'+id);
+    var campoT=document.getElementById('cierre-t-'+id);
+    var n=Math.max(0,Math.round(parseNum(campoN?campoN.value:'0')));
+    cerrarActividad(id, n, campoT?campoT.value:'');
+    cerrandoId=null; pintarRegistro();
+    return;
+  }
+  if(t.dataset.reabrir){ reabrirActividad(t.dataset.reabrir); return; }
+  if(t.dataset.borrar){
+    var bid=t.dataset.borrar;
+    if(borrandoId!==bid){ borrandoId=bid; pintarRegistro(); return; }
+    registro=registro.filter(function(x){ return x.id!==bid; });
+    if(actualId===bid) actualId=null;
+    borrandoId=null; escribirRegistro(); pintarRegistro();
+    return;
+  }
+
+  if(t.id==='btn-csv'){
+    var lista=filtradas();
+    if(!lista.length){ avisoBoton(t,'No hay actividades','Descargar listado'); return; }
+    descargar('actividades-'+marcaTiempo()+'.csv', listadoCSV(lista), 'text/csv;charset=utf-8');
+    return;
+  }
+  if(t.id==='btn-exportar'){
+    if(!registro.length){ avisoBoton(t,'No hay nada que exportar','Exportar copia'); return; }
+    descargar('actividades-copia-'+marcaTiempo()+'.json',
+      JSON.stringify({version:1, exportado:new Date().toISOString(), actividades:registro}, null, 1),
+      'application/json');
+    return;
+  }
+  if(t.id==='btn-importar'){ document.getElementById('fichero-importar').click(); return; }
+});
+
+document.addEventListener('change',function(e){
+  if(e.target.id==='f-periodo'||e.target.id==='f-filtro-estado'){ pintarRegistro(); return; }
+  if(e.target.id==='fichero-importar'){
+    var f=e.target.files&&e.target.files[0];
+    var btn=document.getElementById('btn-importar');
+    if(!f) return;
+    var lector=new FileReader();
+    lector.onload=function(){
+      var nuevas=0;
+      try{
+        var d=JSON.parse(lector.result);
+        var arr=Array.isArray(d)?d:(d.actividades||[]);
+        var vistos={};
+        registro.forEach(function(r){ vistos[r.id]=true; });
+        arr.forEach(function(r){
+          if(!r||!r.id||vistos[r.id]||!r.datos) return;
+          vistos[r.id]=true; registro.push(r); nuevas++;
+        });
+        registro.sort(function(a,b){ return (b.creada||'').localeCompare(a.creada||''); });
+        escribirRegistro(); pintarRegistro();
+        avisoBoton(btn, nuevas?('Añadidas '+nuevas):'Ya estaban todas', 'Importar copia');
+      }catch(err){
+        avisoBoton(btn, 'Fichero no válido', 'Importar copia');
+      }
+    };
+    lector.readAsText(f);
+    e.target.value='';
+  }
+});
+
+/* ─────────── arranque ─────────── */
+pintarFilas();
+pintarSalidas();
+leerRegistro();
+pintarRegistro();
+
+})();
+</script>
+</body>
+</html>
