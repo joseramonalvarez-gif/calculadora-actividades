@@ -669,7 +669,7 @@ tr.bajo td{color:var(--texto-sec)}
 
       <section class="tarjeta">
         <div class="tarjeta-cab"><h2>Margen y precio</h2><span class="etiqueta-num">5</span></div>
-        <p class="tarjeta-nota">Decide desde dónde quieres calcular. Con <b>el precio que pongo</b>, aparece una fila «PVP con IVA» al pie de la tabla del bloque 4, una casilla por paquete: escribes ahí el precio final y la herramienta te dice el margen que queda.</p>
+        <p class="tarjeta-nota">Decide desde dónde quieres calcular. Con <b>el margen que quiero</b>, fijas el margen y la herramienta te da el precio. Con <b>el precio que pongo</b>, aparecen aquí debajo las casillas de precio, una por paquete: escribes el precio final con IVA y la herramienta te dice el margen que queda.</p>
 
         <div style="margin-bottom:14px">
           <label for="seg-calculo">Calcular desde</label>
@@ -692,10 +692,15 @@ tr.bajo td{color:var(--texto-sec)}
             <input id="f-margen" type="text" inputmode="decimal" value="25">
           </div>
           <div>
-            <label for="f-iva">IVA de venta (%)</label>
-            <input id="f-iva" type="text" inputmode="decimal" value="21">
+            <label for="f-iva">IVA de venta</label>
+            <select id="f-iva">
+              <option value="21" selected>21 % · general</option>
+              <option value="10">10 % · reducido</option>
+              <option value="4">4 % · superreducido</option>
+              <option value="0">0 % · exento</option>
+            </select>
           </div>
-          <div>
+          <div id="campo-redondeo">
             <label for="f-redondeo">Redondeo al alza</label>
             <select id="f-redondeo">
               <option value="0">Sin redondeo</option>
@@ -704,6 +709,7 @@ tr.bajo td{color:var(--texto-sec)}
               <option value="10">A 10 €</option>
             </select>
           </div>
+          <div class="campo-ancho" id="bloque-precios" hidden></div>
         </div>
 
         <p class="eq-nota" id="equiv-margen" style="border-top:none;padding-top:0;margin-top:12px"></p>
@@ -1220,6 +1226,35 @@ function pintarFilas(){
   });
 
   pintarMatriz();
+  pintarPrecios();
+}
+
+/* Las casillas de precio viven junto al interruptor que las activa, no al pie
+   de la tabla: nadie va a buscarlas media pantalla más arriba. */
+function pintarPrecios(){
+  var cont=document.getElementById('bloque-precios');
+  var P=estado.paquetes;
+  if(!P.length){
+    cont.innerHTML='<p class="eq-nota" style="border-top:none;padding-top:0;margin-top:0">Añade un paquete en el bloque 4 para poder ponerle precio.</p>';
+    return;
+  }
+  var unico=P.length===1;
+  cont.innerHTML='<div class="rejilla-campos">'+P.map(function(p){
+    return '<div><label for="pk-v-'+p.id+'" id="lbl-precio-'+p.id+'">'+
+      (unico?'Precio por persona, IVA incluido':esc(p.nombre||'Paquete sin nombre')+' · con IVA')+'</label>'+
+      '<input type="text" inputmode="decimal" data-pkg="'+p.id+'" data-campo="precio" id="pk-v-'+p.id+'" value="'+(p.precio?eur.format(p.precio):'')+'" placeholder="Escribe el precio final"></div>';
+  }).join('')+'</div>';
+}
+
+function aplicarModo(){
+  var esMargen=estado.modoCalculo==='margen';
+  document.getElementById('bloque-margen').hidden=!esMargen;
+  document.getElementById('campo-margen').hidden=!esMargen;
+  document.getElementById('campo-redondeo').hidden=!esMargen;
+  document.getElementById('bloque-precios').hidden=esMargen;
+  document.querySelectorAll('#seg-calculo button').forEach(function(b){
+    b.setAttribute('aria-pressed', b.dataset.calculo===estado.modoCalculo?'true':'false');
+  });
 }
 
 function pintarMatriz(){
@@ -1273,14 +1308,6 @@ function pintarMatriz(){
     h+='<input type="text" inputmode="numeric" data-pkg="'+p.id+'" data-campo="personas" id="pk-p-'+p.id+'" value="'+p.personas+'" aria-label="Personas en '+esc(p.nombre)+'">';
   });
   h+='<span></span>';
-
-  if(estado.modoCalculo==='precio'){
-    h+='<span class="etiqueta">PVP con IVA</span><span></span>';
-    P.forEach(function(p){
-      h+='<input type="text" inputmode="decimal" data-pkg="'+p.id+'" data-campo="precio" id="pk-v-'+p.id+'" value="'+(p.precio?eur.format(p.precio):'')+'" placeholder="Precio" aria-label="Precio de venta de '+esc(p.nombre)+'">';
-    });
-    h+='<span></span>';
-  }
 
   cont.innerHTML=h;
   C.forEach(function(c){
@@ -1642,7 +1669,11 @@ function editarMatriz(t){
   if(t.dataset.pkg){
     var p=buscarEn(estado.paquetes,t.dataset.pkg);
     if(!p) return false;
-    if(t.dataset.campo==='nombre') p.nombre=t.value;
+    if(t.dataset.campo==='nombre'){
+      p.nombre=t.value;
+      var lbl=document.getElementById('lbl-precio-'+p.id);
+      if(lbl&&estado.paquetes.length>1) lbl.textContent=(t.value||'Paquete sin nombre')+' · con IVA';
+    }
     else if(t.dataset.campo==='personas') p.personas=Math.max(0,Math.round(parseNum(t.value)));
     else if(t.dataset.campo==='precio') p.precio=parseNum(t.value);
     return true;
@@ -1715,6 +1746,7 @@ document.addEventListener('change',function(e){
     }
     pintarSalidas();
   }
+  if(t.id==='f-iva'){ estado.ivaVenta=parseNum(t.value); pintarSalidas(); }
   if(t.id==='f-redondeo'){ estado.redondeo=parseNum(t.value); pintarSalidas(); }
 });
 
@@ -1752,12 +1784,7 @@ document.addEventListener('click',function(e){
 
   if(t.dataset&&t.dataset.calculo){
     estado.modoCalculo=t.dataset.calculo;
-    document.querySelectorAll('#seg-calculo button').forEach(function(b){
-      b.setAttribute('aria-pressed', b.dataset.calculo===estado.modoCalculo ? 'true':'false');
-    });
-    var esMargen=estado.modoCalculo==='margen';
-    document.getElementById('bloque-margen').hidden=!esMargen;
-    document.getElementById('campo-margen').hidden=!esMargen;
+    aplicarModo();
     pintarFilas(); pintarSalidas(); return;
   }
 
@@ -2065,15 +2092,10 @@ function cargar(d){
   document.getElementById('f-margen').value=String(estado.margen);
   document.getElementById('f-iva').value=String(estado.ivaVenta);
   document.getElementById('f-redondeo').value=String(estado.redondeo);
-  document.querySelectorAll('#seg-calculo button').forEach(function(b){
-    b.setAttribute('aria-pressed', b.dataset.calculo===estado.modoCalculo?'true':'false');
-  });
   document.querySelectorAll('#seg-base button').forEach(function(b){
     b.setAttribute('aria-pressed', b.dataset.base===estado.baseMargen?'true':'false');
   });
-  var esMargen=estado.modoCalculo==='margen';
-  document.getElementById('bloque-margen').hidden=!esMargen;
-  document.getElementById('campo-margen').hidden=!esMargen;
+  aplicarModo();
   pintarFilas(); pintarSalidas();
 }
 
