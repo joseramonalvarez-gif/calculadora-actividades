@@ -222,6 +222,10 @@ input::placeholder{color:var(--texto-sec);opacity:.65;font-weight:400}
 .matriz input,.matriz select{padding:7px 9px;font-size:13.5px}
 .matriz .pkg{display:flex;gap:5px;align-items:center}
 .matriz .pkg input{min-width:0}
+.matriz .celda{display:flex;align-items:center;gap:5px;min-width:0}
+.matriz .celda input[type="checkbox"]{width:16px;height:16px;flex:none;margin:0;accent-color:var(--acento);cursor:pointer}
+.matriz .celda input[type="text"]{flex:1;min-width:0}
+.matriz .celda.apagada input[type="text"]{color:var(--texto-sec);opacity:.5}
 .anadir-fila{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
 .anadir-fila .anadir{margin-top:0;flex:1;min-width:150px}
 .fila input,.fila select{padding:7px 9px;font-size:13.5px}
@@ -522,7 +526,7 @@ tr.bajo td{color:var(--texto-sec)}
       </div>
       <div class="paso">
         <b>4 · Costes por participante</b>
-        <span>Lo que va por persona: alojamiento, comidas, dorsal, seguro. Siempre el importe de una sola persona. Si no todos pagan lo mismo —individual y doble—, «Añadir paquete» abre una columna más y cada una sale con su precio.</span>
+        <span>Lo que va por persona: alojamiento, comidas, dorsal, seguro. Siempre el importe de una sola persona. Si no todos pagan lo mismo —individual y doble—, «Añadir paquete» abre una columna más y cada una sale con su precio. Cada celda lleva una marca que dice si ese concepto entra en ese paquete: así se montan niveles básico, estándar y premium.</span>
       </div>
       <div class="paso">
         <b>5 · Margen y precio</b>
@@ -652,8 +656,8 @@ tr.bajo td{color:var(--texto-sec)}
           <span class="marca"></span>
           <div>
             <p style="margin-bottom:6px"><b>Cuándo hace falta un segundo paquete.</b> Solo si no todo el mundo paga lo mismo: unos van en individual y otros en doble, o unos comen y otros no. Si todos pagan igual, con una columna basta y nada de esto aparece.</p>
-            <p style="margin-bottom:6px"><b>Cómo se hace.</b> Pulsa «Añadir paquete», pon nombre a cada columna y escribe en cada una lo que cuesta por persona en esa modalidad. Lo que es igual para todos —el dorsal— se repite en las dos. En «Personas», cuántos van en cada una.</p>
-            <p><b>Cómo se lee.</b> Cada columna sale con su propio precio en el panel de la derecha. Los costes fijos se reparten entre todos los participantes juntos, vayan en la modalidad que vayan: en el ejemplo, 14 en individual y 14 en doble, 28 en total.</p>
+            <p style="margin-bottom:6px"><b>Cómo se hace.</b> Pulsa «Añadir paquete», pon nombre a cada columna y escribe en cada una lo que cuesta por persona en esa modalidad. Lo que es igual para todos —el dorsal— se repite en las dos. En «Personas», cuántos van en cada una. <b>Cada celda lleva una marca</b>: quítala y ese concepto no entra en ese paquete; el importe se queda escrito en gris por si lo vuelves a activar. Así se montan niveles —básico, estándar, premium— sin borrar números. Una marca puesta con importe cero es «incluido sin coste extra», para regalos.</p>
+            <p><b>Cómo se lee.</b> Cada columna sale con su propio precio en el panel de la derecha. Los costes fijos se reparten entre todos los participantes juntos, vayan en la modalidad que vayan: en el ejemplo, 14 en individual y 14 en doble, 28 en total. Y el texto comercial sale por paquete: lo común una vez, y en cada nivel lo que incluye de más y lo que no.</p>
           </div>
         </div>
         <div class="contenedor-tabla"><div class="matriz" id="matriz"></div></div>
@@ -1001,8 +1005,8 @@ var estado={
     {id:'p2',nombre:'Habitación doble',personas:14,precio:0}
   ],
   conceptos:[
-    {id:nextId(),nombre:'Alojamiento',iva:10,incl:true,valores:{p1:120,p2:80}},
-    {id:nextId(),nombre:'Dorsal / inscripción',iva:10,incl:true,valores:{p1:40,p2:40}}
+    {id:nextId(),nombre:'Alojamiento',iva:10,valores:{p1:120,p2:80},incluido:{}},
+    {id:nextId(),nombre:'Dorsal / inscripción',iva:10,valores:{p1:40,p2:40},incluido:{}}
   ],
   modoCalculo:'margen',
   baseMargen:'ventas',
@@ -1050,6 +1054,14 @@ function valorDe(concepto, paqueteId){
   var v=concepto.valores?concepto.valores[paqueteId]:0;
   return isFinite(v)?v:0;
 }
+/* Cada celda lleva una marca de incluido. Sin marca, el importe sigue escrito
+   pero no cuenta: así se montan niveles sin borrar números. */
+function incluidoEn(concepto, paqueteId){
+  return !(concepto.incluido&&concepto.incluido[paqueteId]===false);
+}
+function costeDe(concepto, paqueteId){
+  return incluidoEn(concepto,paqueteId)?valorDe(concepto,paqueteId):0;
+}
 
 function calcular(){
   var n=0;
@@ -1065,7 +1077,7 @@ function calcular(){
   var opciones=estado.paquetes.map(function(p){
     var cvOp=0, ivaPax=0;
     estado.conceptos.forEach(function(c){
-      var v=valorDe(c,p.id);
+      var v=costeDe(c,p.id);
       cvOp+=v; ivaPax+=v*c.iva/100;
     });
     var costePax=(n>0? cfBase/n : NaN)+cvOp;
@@ -1221,12 +1233,12 @@ function pintarMatriz(){
   }
 
   cont.style.gridTemplateColumns=
-    'minmax(140px,1.4fr) 66px 34px repeat('+P.length+',minmax(100px,1fr)) 30px';
+    'minmax(140px,1.4fr) 66px repeat('+P.length+',minmax(122px,1fr)) 30px';
 
   var h='', unico=P.length===1;
   /* Con un solo paquete no hay nada que nombrar ni que comparar: la columna es
      simplemente el importe, y la idea de «paquete» no aparece hasta que hace falta. */
-  h+='<span class="cab">Concepto</span><span class="cab cen">IVA</span><span class="cab cen">Incl.</span>';
+  h+='<span class="cab">Concepto</span><span class="cab cen">IVA</span>';
   if(unico){
     h+='<span class="cab der">Importe por persona</span>';
   } else {
@@ -1244,23 +1256,26 @@ function pintarMatriz(){
   }
   C.forEach(function(c){
     h+='<input type="text" data-cpt="'+c.id+'" data-campo="nombre" id="cp-n-'+c.id+'" value="'+esc(c.nombre)+'" placeholder="Alojamiento, comidas…" aria-label="Concepto">'+
-       '<select data-cpt="'+c.id+'" data-campo="iva" id="cp-v-'+c.id+'" aria-label="Tipo de IVA">'+opcionesIva+'</select>'+
-       '<span class="caja-incl"><input type="checkbox" data-cpt="'+c.id+'" data-campo="incl" id="cp-x-'+c.id+'" '+(c.incl?'checked':'')+' aria-label="Aparece en el qué incluye"></span>';
+       '<select data-cpt="'+c.id+'" data-campo="iva" id="cp-v-'+c.id+'" aria-label="Tipo de IVA">'+opcionesIva+'</select>';
     P.forEach(function(p){
-      h+='<input type="text" inputmode="decimal" data-cpt="'+c.id+'" data-valor="'+p.id+'" id="cp-'+c.id+'-'+p.id+'" value="'+eur.format(valorDe(c,p.id))+'" aria-label="'+esc(c.nombre)+' en '+esc(p.nombre)+'">';
+      var on=incluidoEn(c,p.id);
+      h+='<span class="celda'+(on?'':' apagada')+'" id="celda-'+c.id+'-'+p.id+'">'+
+         '<input type="checkbox" data-cpt="'+c.id+'" data-inc="'+p.id+'" id="inc-'+c.id+'-'+p.id+'" '+(on?'checked':'')+' aria-label="'+esc(c.nombre)+' incluido en '+esc(p.nombre||'este paquete')+'">'+
+         '<input type="text" inputmode="decimal" data-cpt="'+c.id+'" data-valor="'+p.id+'" id="cp-'+c.id+'-'+p.id+'" value="'+eur.format(valorDe(c,p.id))+'" aria-label="'+esc(c.nombre)+' en '+esc(p.nombre)+'">'+
+         '</span>';
     });
     h+='<button class="quitar" type="button" data-quitar-cpt="'+c.id+'" aria-label="Quitar concepto">&times;</button>';
   });
 
   h+='<span class="sep"></span>';
-  h+='<span class="etiqueta">Personas</span><span></span><span></span>';
+  h+='<span class="etiqueta">Personas</span><span></span>';
   P.forEach(function(p){
     h+='<input type="text" inputmode="numeric" data-pkg="'+p.id+'" data-campo="personas" id="pk-p-'+p.id+'" value="'+p.personas+'" aria-label="Personas en '+esc(p.nombre)+'">';
   });
   h+='<span></span>';
 
   if(estado.modoCalculo==='precio'){
-    h+='<span class="etiqueta">PVP con IVA</span><span></span><span></span>';
+    h+='<span class="etiqueta">PVP con IVA</span><span></span>';
     P.forEach(function(p){
       h+='<input type="text" inputmode="decimal" data-pkg="'+p.id+'" data-campo="precio" id="pk-v-'+p.id+'" value="'+(p.precio?eur.format(p.precio):'')+'" placeholder="Precio" aria-label="Precio de venta de '+esc(p.nombre)+'">';
     });
@@ -1294,7 +1309,6 @@ function pintarTotalesMatriz(c){
   var e=document.createElement('span');
   e.className='etiqueta'; e.textContent='Suma por persona';
   cont.appendChild(e);
-  cont.appendChild(document.createElement('span'));
   cont.appendChild(document.createElement('span'));
   c.opciones.forEach(function(o){
     var s=document.createElement('span');
@@ -1477,7 +1491,7 @@ function pintarDesglose(c){
   var hayVar=false, varios=estado.paquetes.length>1;
   estado.conceptos.forEach(function(cp){
     c.opciones.forEach(function(o){
-      var v=valorDe(cp,o.id);
+      var v=costeDe(cp,o.id);
       if(v<=0) return;
       hayVar=true;
       h+='<div class="desglose-linea"><span class="concepto">'+esc(cp.nombre||'Sin concepto')+
@@ -1508,38 +1522,47 @@ function construirPaquete(c){
   if(sub.length) L.push(sub.join(' · '));
   L.push('');
 
-  if(c.opciones.length&&c.n>0){
-    var unico=c.opciones.length===1;
-    c.opciones.forEach(function(o){
-      L.push(unico
-        ? money(o.pvpIva)+' por persona, IVA incluido'
-        : (o.nombre||'Paquete')+': '+money(o.pvpIva)+' por persona, IVA incluido');
-    });
-    L.push('');
-  }
-
-  var incluye=[];
-  estado.cf.forEach(function(r){ if(r.incl&&r.concepto) incluye.push(r.concepto); });
+  /* Lo común a todos los paquetes va una vez; lo que distingue a cada nivel,
+     paquete por paquete. Así el texto vende un escalado y no una lista vaga. */
+  var P=estado.paquetes, unico=c.opciones.length===1;
+  var comunes=[], parciales=[], nadie=[];
+  estado.cf.forEach(function(r){ if(r.incl&&r.concepto) comunes.push(r.concepto); });
   estado.conceptos.forEach(function(cp){
-    if(!cp.incl||!cp.nombre) return;
-    var enAlguno=estado.paquetes.some(function(p){ return valorDe(cp,p.id)>0; });
-    if(!enAlguno) return;
-    var enTodos=estado.paquetes.every(function(p){ return valorDe(cp,p.id)>0; });
-    incluye.push((enTodos||estado.paquetes.length<2) ? cp.nombre : cp.nombre+', según el paquete elegido');
+    if(!cp.nombre) return;
+    var cuantos=P.filter(function(p){ return incluidoEn(cp,p.id); }).length;
+    if(cuantos===0) nadie.push(cp.nombre);
+    else if(cuantos===P.length) comunes.push(cp.nombre);
+    else parciales.push(cp);
   });
-  if(estado.eq.length) incluye.push('Acompañamiento técnico de Bendhora durante toda la salida');
+  if(estado.eq.length) comunes.push('Acompañamiento técnico de Bendhora durante toda la salida');
 
-  if(incluye.length){
-    L.push('INCLUYE');
-    incluye.forEach(function(t){ L.push('· '+t); });
-    L.push('');
+  if(unico){
+    if(c.n>0){ L.push(money(c.opciones[0].pvpIva)+' por persona, IVA incluido'); L.push(''); }
+    if(comunes.length){
+      L.push('INCLUYE');
+      comunes.forEach(function(t){ L.push('· '+t); });
+      L.push('');
+    }
+  } else {
+    if(comunes.length){
+      L.push('TODOS LOS PAQUETES INCLUYEN');
+      comunes.forEach(function(t){ L.push('· '+t); });
+      L.push('');
+    }
+    if(c.n>0) c.opciones.forEach(function(o){
+      L.push((o.nombre||'Paquete').toUpperCase()+' · '+money(o.pvpIva)+' por persona, IVA incluido');
+      var si=[], no=[];
+      parciales.forEach(function(cp){ (incluidoEn(cp,o.id)?si:no).push(cp.nombre); });
+      if(si.length) L.push('Incluye además: '+si.join(', ')+'.');
+      if(no.length) L.push('No incluye: '+no.join(', ')+'.');
+      L.push('');
+    });
   }
 
-  var noIncluye=[];
+  var noIncluye=nadie.slice();
   estado.cf.forEach(function(r){ if(!r.incl&&r.concepto) noIncluye.push(r.concepto); });
-  estado.conceptos.forEach(function(cp){ if(!cp.incl&&cp.nombre) noIncluye.push(cp.nombre); });
   if(noIncluye.length){
-    L.push('NO INCLUYE');
+    L.push(unico?'NO INCLUYE':'NO INCLUIDO EN NINGÚN PAQUETE');
     noIncluye.forEach(function(t){ L.push('· '+t); });
     L.push('');
   }
@@ -1606,8 +1629,13 @@ function editarMatriz(t){
     var c=buscarEn(estado.conceptos,t.dataset.cpt);
     if(!c) return false;
     if(t.dataset.valor!==undefined) c.valores[t.dataset.valor]=parseNum(t.value);
+    else if(t.dataset.inc!==undefined){
+      if(!c.incluido) c.incluido={};
+      c.incluido[t.dataset.inc]=t.checked;
+      var celda=document.getElementById('celda-'+c.id+'-'+t.dataset.inc);
+      if(celda) celda.classList.toggle('apagada',!t.checked);
+    }
     else if(t.dataset.campo==='nombre') c.nombre=t.value;
-    else if(t.dataset.campo==='incl') c.incl=t.checked;
     else if(t.dataset.campo==='iva') c.iva=parseNum(t.value);
     return true;
   }
@@ -1702,7 +1730,7 @@ document.addEventListener('click',function(e){
   if(t.dataset.quitarPkg){
     var pid=t.dataset.quitarPkg;
     estado.paquetes=estado.paquetes.filter(function(p){ return p.id!==pid; });
-    estado.conceptos.forEach(function(c){ delete c.valores[pid]; });
+    estado.conceptos.forEach(function(c){ delete c.valores[pid]; if(c.incluido) delete c.incluido[pid]; });
     pintarFilas(); pintarSalidas(); return;
   }
 
@@ -1717,7 +1745,7 @@ document.addEventListener('click',function(e){
   if(anadir){
     if(anadir==='cf') estado.cf.push({id:nextId(),concepto:'',importe:0,iva:21,incl:true,capacidad:0});
     if(anadir==='eq') estado.eq.push({id:nextId(),nombre:'',tipo:'nomina',jornadas:1,pct:100,importe:0,alojamiento:0,dietas:0,iva:10});
-    if(anadir==='concepto') estado.conceptos.push({id:nextId(),nombre:'',iva:10,incl:true,valores:{}});
+    if(anadir==='concepto') estado.conceptos.push({id:nextId(),nombre:'',iva:10,valores:{},incluido:{}});
     if(anadir==='paquete') estado.paquetes.push({id:'p'+Date.now().toString(36),nombre:'',personas:0,precio:0});
     pintarFilas(); pintarSalidas(); return;
   }
@@ -1985,8 +2013,11 @@ function cargar(d){
       var copia={}; for(var k in p) copia[k]=p[k]; return copia;
     });
     estado.conceptos=d.conceptos.map(function(c){
-      var copia={nombre:c.nombre,iva:c.iva,incl:c.incl,valores:{},id:nextId()};
+      var copia={nombre:c.nombre,iva:c.iva,valores:{},incluido:{},id:nextId()};
       for(var v in (c.valores||{})) copia.valores[v]=c.valores[v];
+      for(var k in (c.incluido||{})) copia.incluido[k]=c.incluido[k];
+      /* guardadas cuando la marca era por concepto y no por celda */
+      if(c.incl===false&&!c.incluido) d.paquetes.forEach(function(p){ copia.incluido[p.id]=false; });
       return copia;
     });
   } else if(Array.isArray(d.cv)||Array.isArray(d.op)){
@@ -1999,7 +2030,8 @@ function cargar(d){
     var cps=[];
     (d.cv||[]).forEach(function(r){
       var val={}; paqs.forEach(function(p){ val[p.id]=r.importe||0; });
-      cps.push({id:nextId(),nombre:r.concepto||'',iva:r.iva||10,incl:r.incl!==false,valores:val});
+      var inc={}; if(r.incl===false) paqs.forEach(function(p){ inc[p.id]=false; });
+      cps.push({id:nextId(),nombre:r.concepto||'',iva:r.iva||10,valores:val,incluido:inc});
     });
     var valA={}, valC={}, hayA=false, hayC=false;
     (d.op||[]).forEach(function(o,i){
