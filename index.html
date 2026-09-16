@@ -1160,9 +1160,9 @@ function pintarSalidas(){
       '<div class="cifra">'+money(c.costesTot)+'</div>'+
       '<div class="pie">'+money(c.cfBase)+' fijos · '+money(c.costesTot-c.cfBase)+' variables</div></div>'+
     (c.jornadas>0
-      ? '<div class="metrica destacada" style="grid-column:1/-1"><span class="eyebrow">Deja por jornada de técnico</span>'+
+      ? '<div class="metrica" style="grid-column:1/-1"><span class="eyebrow">Deja por jornada de técnico</span>'+
         '<div class="cifra">'+money(c.contribJornada)+'</div>'+
-        '<div class="pie">La salida se come '+jorTexto+'. Con esta cifra se comparan actividades entre sí: el recurso escaso son los días de técnico, no el dinero.</div></div>'
+        '<div class="pie">La salida se come '+jorTexto+'. Sirve para comparar unas salidas con otras: cuánto deja cada día de trabajo invertido.</div></div>'
       : '');
 
   /* avisos */
