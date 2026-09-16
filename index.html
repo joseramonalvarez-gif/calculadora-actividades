@@ -511,7 +511,7 @@ tr.bajo td{color:var(--texto-sec)}
     <div class="instrucciones-cuerpo">
       <div class="paso">
         <b>1 · La actividad</b>
-        <span>Nombre, sitio y fechas. El <b>día de inicio</b> sirve para ordenar el histórico por mes o por año; las <b>fechas para el cliente</b> son el texto que sale en el paquete, tal cual lo escribas.</span>
+        <span>Nombre, sitio y días. Con el primer y el último día, el texto de <b>fechas para el cliente</b> se escribe solo —«21 y 22 de febrero de 2026»— y te dice qué días de la semana caen. Si prefieres otra redacción, escribe encima y deja de tocarse.</span>
       </div>
       <div class="paso">
         <b>2 · Costes fijos</b>
@@ -597,13 +597,18 @@ tr.bajo td{color:var(--texto-sec)}
             <input id="f-lugar" type="text" placeholder="Vitoria-Gasteiz">
           </div>
           <div>
-            <label for="f-fecha">Día de inicio</label>
+            <label for="f-fecha">Primer día</label>
             <input id="f-fecha" type="date">
           </div>
           <div>
-            <label for="f-fechas">Fechas para el cliente</label>
-            <input id="f-fechas" type="text" placeholder="21 y 22 de febrero">
+            <label for="f-fecha-fin">Último día</label>
+            <input id="f-fecha-fin" type="date">
           </div>
+          <div>
+            <label for="f-fechas">Fechas para el cliente</label>
+            <input id="f-fechas" type="text" placeholder="Se escribe solo">
+          </div>
+          <p class="eq-nota campo-ancho" id="pista-fechas" style="border-top:none;padding-top:0;margin-top:0"></p>
           <div>
             <label for="f-tipo">Tipo</label>
             <select id="f-tipo">
@@ -860,12 +865,68 @@ function esc(s){
 }
 var uid=0; function nextId(){ return 'r'+(++uid); }
 
+/* ─────────── fechas ─────────── */
+var MESES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto',
+           'septiembre','octubre','noviembre','diciembre'];
+var SEMANA=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+
+function fechaDesde(s){
+  if(!s) return null;
+  var d=new Date(s+'T00:00:00');
+  return isNaN(d.getTime())?null:d;
+}
+function ordenadas(ini,fin){
+  var a=fechaDesde(ini), b=fechaDesde(fin);
+  if(!a&&!b) return null;
+  if(!a){ a=b; b=null; }
+  if(b&&b<a){ var t=a; a=b; b=t; }
+  return {a:a,b:b};
+}
+function textoFechas(ini,fin){
+  var r=ordenadas(ini,fin); if(!r) return '';
+  var a=r.a, b=r.b;
+  if(!b||a.getTime()===b.getTime()){
+    return a.getDate()+' de '+MESES[a.getMonth()]+' de '+a.getFullYear();
+  }
+  var dias=Math.round((b-a)/86400000)+1;
+  if(a.getFullYear()===b.getFullYear()){
+    if(a.getMonth()===b.getMonth()){
+      return (dias===2 ? a.getDate()+' y '+b.getDate() : 'del '+a.getDate()+' al '+b.getDate())+
+             ' de '+MESES[b.getMonth()]+' de '+b.getFullYear();
+    }
+    return 'del '+a.getDate()+' de '+MESES[a.getMonth()]+
+           ' al '+b.getDate()+' de '+MESES[b.getMonth()]+' de '+b.getFullYear();
+  }
+  return 'del '+a.getDate()+' de '+MESES[a.getMonth()]+' de '+a.getFullYear()+
+         ' al '+b.getDate()+' de '+MESES[b.getMonth()]+' de '+b.getFullYear();
+}
+function pistaFechas(ini,fin){
+  var r=ordenadas(ini,fin); if(!r) return '';
+  var a=r.a, b=r.b||r.a;
+  var n=Math.round((b-a)/86400000)+1;
+  return n===1
+    ? '1 día · '+SEMANA[a.getDay()]
+    : n+' días · de '+SEMANA[a.getDay()]+' a '+SEMANA[b.getDay()];
+}
+/* El texto del cliente se escribe solo mientras nadie lo haya tocado a mano. */
+function sincronizarFechas(){
+  if(!estado.fechasManual){
+    estado.fechas=textoFechas(estado.fecha,estado.fechaFin);
+    var campo=document.getElementById('f-fechas');
+    if(campo) campo.value=estado.fechas;
+  }
+  var pista=document.getElementById('pista-fechas');
+  if(pista) pista.textContent=pistaFechas(estado.fecha,estado.fechaFin);
+}
+
 /* ─────────── estado ─────────── */
 var estado={
   nombre:'Competición NW · Vitoria-Gasteiz',
   lugar:'Vitoria-Gasteiz',
   fechas:'',
   fecha:'',
+  fechaFin:'',
+  fechasManual:false,
   tipo:'competicion',
   limite:'',
   cf:[
@@ -1520,8 +1581,12 @@ document.addEventListener('input',function(e){
   switch(t.id){
     case 'f-nombre': estado.nombre=t.value; break;
     case 'f-lugar': estado.lugar=t.value; break;
-    case 'f-fechas': estado.fechas=t.value; break;
-    case 'f-fecha': estado.fecha=t.value; break;
+    case 'f-fechas':
+      estado.fechas=t.value;
+      estado.fechasManual=t.value.trim()!=='';
+      break;
+    case 'f-fecha': estado.fecha=t.value; sincronizarFechas(); break;
+    case 'f-fecha-fin': estado.fechaFin=t.value; sincronizarFechas(); break;
     case 'f-limite': estado.limite=t.value; break;
     case 'f-margen': estado.margen=parseNum(t.value); break;
     case 'f-iva': estado.ivaVenta=parseNum(t.value); break;
@@ -1663,7 +1728,8 @@ function instantanea(){
   var c=calcular();
   return {
     datos:{
-      nombre:estado.nombre, lugar:estado.lugar, fechas:estado.fechas, fecha:estado.fecha,
+      nombre:estado.nombre, lugar:estado.lugar, fechas:estado.fechas,
+      fecha:estado.fecha, fechaFin:estado.fechaFin, fechasManual:estado.fechasManual,
       tipo:estado.tipo, limite:estado.limite,
       cf:estado.cf, eq:estado.eq, conceptos:estado.conceptos, paquetes:estado.paquetes,
       modoCalculo:estado.modoCalculo, baseMargen:estado.baseMargen,
@@ -1836,7 +1902,8 @@ function pintarRegistro(){
 }
 
 function cargar(d){
-  ['nombre','lugar','fechas','fecha','tipo','limite','modoCalculo','baseMargen','margen','ivaVenta','redondeo'].forEach(function(k){
+  ['nombre','lugar','fechas','fecha','fechaFin','fechasManual','tipo','limite',
+   'modoCalculo','baseMargen','margen','ivaVenta','redondeo'].forEach(function(k){
     if(d[k]!==undefined) estado[k]=d[k];
   });
   ['cf','eq'].forEach(function(k){
@@ -1893,7 +1960,9 @@ function cargar(d){
   document.getElementById('f-nombre').value=estado.nombre||'';
   document.getElementById('f-lugar').value=estado.lugar||'';
   document.getElementById('f-fecha').value=estado.fecha||'';
+  document.getElementById('f-fecha-fin').value=estado.fechaFin||'';
   document.getElementById('f-fechas').value=estado.fechas||'';
+  sincronizarFechas();
   document.getElementById('f-limite').value=estado.limite||'';
   document.getElementById('f-tipo').value=estado.tipo||'otro';
   document.getElementById('f-margen').value=String(estado.margen);
@@ -2066,6 +2135,7 @@ document.addEventListener('change',function(e){
 });
 
 /* ─────────── arranque ─────────── */
+sincronizarFechas();
 pintarFilas();
 pintarSalidas();
 leerRegistro();
