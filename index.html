@@ -219,7 +219,6 @@ input::placeholder{color:var(--texto-sec);opacity:.65;font-weight:400}
   font-family:'Manrope',sans-serif;font-size:14px;font-weight:600;text-align:right;
   font-variant-numeric:tabular-nums;letter-spacing:-.01em;
 }
-.matriz .valor.fuerte{font-size:16px;color:var(--acento)}
 .matriz input,.matriz select{padding:7px 9px;font-size:13.5px}
 .matriz .pkg{display:flex;gap:5px;align-items:center}
 .matriz .pkg input{min-width:0}
@@ -1284,23 +1283,21 @@ function pintarTotalesMatriz(c){
   sep.className='sep pie-matriz';
   cont.appendChild(sep);
 
-  function fila(etiqueta, valores, fuerte){
-    var e=document.createElement('span');
-    e.className='etiqueta'; e.textContent=etiqueta;
-    cont.appendChild(e);
-    cont.appendChild(document.createElement('span'));
-    cont.appendChild(document.createElement('span'));
-    valores.forEach(function(v){
-      var s=document.createElement('span');
-      s.className='valor'+(fuerte?' fuerte':'');
-      s.textContent=v;
-      cont.appendChild(s);
-    });
-    cont.appendChild(document.createElement('span'));
-  }
-
-  fila('Coste por persona', c.opciones.map(function(o){ return money(o.costePax); }), false);
-  fila('Precio con IVA', c.opciones.map(function(o){ return money(o.pvpIva); }), true);
+  /* Solo la suma de lo que hay en la tabla. El coste completo y el precio
+     viven en el panel de resultados: aquí confundían, porque mezclaban la
+     parte de fijos con una tabla que solo enseña variables. */
+  var e=document.createElement('span');
+  e.className='etiqueta'; e.textContent='Suma por persona';
+  cont.appendChild(e);
+  cont.appendChild(document.createElement('span'));
+  cont.appendChild(document.createElement('span'));
+  c.opciones.forEach(function(o){
+    var s=document.createElement('span');
+    s.className='valor';
+    s.textContent=money(o.cvOp);
+    cont.appendChild(s);
+  });
+  cont.appendChild(document.createElement('span'));
 }
 
 /* ─────────── salidas ─────────── */
