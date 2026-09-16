@@ -192,7 +192,6 @@ input::placeholder{color:var(--texto-sec);opacity:.65;font-weight:400}
   background:var(--superficie-alt);border:1px solid var(--linea);
   border-radius:10px;padding:10px;
 }
-.fila-coste{grid-template-columns:minmax(0,1fr) 104px 74px 34px 30px}
 .fila-cf{grid-template-columns:minmax(0,1fr) 104px 74px 82px 34px 30px}
 .fila-equipo{display:block}
 .eq-cab{display:grid;grid-template-columns:minmax(0,1fr) 124px 30px;gap:8px;align-items:center}
@@ -203,7 +202,29 @@ input::placeholder{color:var(--texto-sec);opacity:.65;font-weight:400}
   padding-top:7px;border-top:1px dashed var(--linea-fuerte);
 }
 .eq-nota b{color:var(--texto);font-weight:600}
-.fila-opcion{grid-template-columns:minmax(0,1fr) 92px 92px 66px 62px 34px 30px}
+/* ---------- matriz de conceptos × paquetes ---------- */
+.matriz{display:grid;gap:8px;align-items:center;min-width:min-content;padding-bottom:2px}
+.matriz .cab{
+  font-family:'Manrope',sans-serif;font-size:10px;font-weight:600;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--texto-sec);white-space:nowrap;
+}
+.matriz .der{text-align:right}
+.matriz .cen{text-align:center}
+.matriz .sep{grid-column:1/-1;height:1px;background:var(--linea);margin:5px 0 3px}
+.matriz .etiqueta{
+  font-family:'Manrope',sans-serif;font-size:12.5px;font-weight:500;color:var(--texto-sec);
+  white-space:nowrap;
+}
+.matriz .valor{
+  font-family:'Manrope',sans-serif;font-size:14px;font-weight:600;text-align:right;
+  font-variant-numeric:tabular-nums;letter-spacing:-.01em;
+}
+.matriz .valor.fuerte{font-size:16px;color:var(--acento)}
+.matriz input,.matriz select{padding:7px 9px;font-size:13.5px}
+.matriz .pkg{display:flex;gap:5px;align-items:center}
+.matriz .pkg input{min-width:0}
+.anadir-fila{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
+.anadir-fila .anadir{margin-top:0;flex:1;min-width:150px}
 .fila input,.fila select{padding:7px 9px;font-size:13.5px}
 .fila-cab{
   display:grid;gap:8px;padding:0 10px 2px;
@@ -623,29 +644,15 @@ tr.bajo td{color:var(--texto-sec)}
       </section>
 
       <section class="tarjeta">
-        <div class="tarjeta-cab"><h2>Coste por participante</h2>
+        <div class="tarjeta-cab"><h2>Costes por participante</h2>
           <span style="display:flex;gap:6px;align-items:center;flex:none">
             <span class="tipo-chip variable">Se multiplica</span><span class="etiqueta-num">4</span></span></div>
-        <p class="tarjeta-nota">Lo que paga <b>todo el mundo por igual</b>, vaya en el paquete que vaya: dorsal, seguro, camiseta. Si la comida es la misma para todos también puede ir aquí; si cambia según el paquete, va en el bloque 5. Importes <b>sin IVA y de una sola persona</b>.</p>
-        <div class="fila-cab fila-coste">
-          <span>Concepto</span><span class="der">Por persona</span><span class="cen">IVA</span><span class="cen">Incl.</span><span></span>
+        <p class="tarjeta-nota">Cada línea es un coste: alojamiento, comidas, dorsal, seguro, lo que sea. Cada columna es un paquete con su propio precio de venta. Los importes son siempre <b>de una sola persona</b>: si la individual cuesta 120 € escribe 120, no 120 por los que van. <b>Deja en cero lo que ese paquete no lleve</b>, y si un coste lo paga todo el mundo igual, escribe la misma cifra en todas las columnas.</p>
+        <div class="contenedor-tabla"><div class="matriz" id="matriz"></div></div>
+        <div class="anadir-fila">
+          <button class="anadir" type="button" data-anadir="concepto">Añadir concepto</button>
+          <button class="anadir" type="button" data-anadir="paquete">Añadir paquete</button>
         </div>
-        <div class="filas" id="filas-cv"></div>
-        <button class="anadir" type="button" data-anadir="cv">Añadir coste por participante</button>
-        <div class="subtotal"><span>Coste variable por persona</span><b id="sub-cv">0,00 €</b></div>
-      </section>
-
-      <section class="tarjeta">
-        <div class="tarjeta-cab"><h2>Paquetes</h2>
-          <span style="display:flex;gap:6px;align-items:center;flex:none">
-            <span class="tipo-chip variable">Se multiplica</span><span class="etiqueta-num">5</span></span></div>
-        <p class="tarjeta-nota">Cada línea es un paquete con su propio precio de venta. Alojamiento y comidas van separados porque no siempre hay los dos: una salida de un día lleva comida y cero alojamiento, y una competición al revés. <b>Deja en cero lo que no haya.</b> Los importes son siempre <b>de una sola persona</b>: si la individual cuesta 120 € escribe 120, no 120 por los que van.</p>
-        <div class="fila-cab fila-opcion">
-          <span>Paquete</span><span class="der">Alojamiento</span><span class="der">Comidas</span><span class="cen">IVA</span><span class="der">Personas</span><span class="cen">Incl.</span><span></span>
-        </div>
-        <div class="filas" id="filas-op"></div>
-        <button class="anadir" type="button" data-anadir="op">Añadir opción</button>
-        <div class="subtotal"><span>Participantes totales</span><b id="sub-op">0</b></div>
       </section>
 
       <section class="tarjeta">
@@ -868,11 +875,15 @@ var estado={
   eq:[
     {id:nextId(),nombre:'Sergi · técnico',tipo:'nomina',jornadas:2,pct:50,importe:0,alojamiento:120,dietas:0,iva:10}
   ],
-  cv:[
-    {id:nextId(),concepto:'Dorsal / inscripción',importe:0,iva:10,incl:true}
+  /* Los costes por persona viven en una matriz: cada concepto es una fila y cada
+     paquete una columna. Así un coste común se escribe una vez por paquete sin
+     tener que decidir a qué bloque pertenece. */
+  paquetes:[
+    {id:'p1',nombre:'Habitación individual',personas:28,precio:0}
   ],
-  op:[
-    {id:nextId(),nombre:'Habitación individual',aloj:120,comidas:0,iva:10,personas:28,incl:true,precio:0}
+  conceptos:[
+    {id:nextId(),nombre:'Alojamiento',iva:10,incl:true,valores:{p1:120}},
+    {id:nextId(),nombre:'Dorsal / inscripción',iva:10,incl:true,valores:{p1:0}}
   ],
   modoCalculo:'margen',
   baseMargen:'ventas',
@@ -916,27 +927,32 @@ function cfEn(n){
   return {base:base,iva:iva,detalle:detalle,jornadas:jornadas};
 }
 
+function valorDe(concepto, paqueteId){
+  var v=concepto.valores?concepto.valores[paqueteId]:0;
+  return isFinite(v)?v:0;
+}
+
 function calcular(){
   var n=0;
-  estado.op.forEach(function(o){ n+=o.personas; });
+  estado.paquetes.forEach(function(p){ n+=p.personas; });
 
   var cf=cfEn(n);
   var cfBase=cf.base, cfIva=cf.iva;
-
-  var cvBase=0, cvIvaUd=0;
-  estado.cv.forEach(function(r){ cvBase+=r.importe; cvIvaUd+=r.importe*r.iva/100; });
 
   var ivaV=estado.ivaVenta/100;
   var m=estado.margen/100;
   if(estado.baseMargen==='ventas'&&m>=0.95) m=0.95;
 
-  var opciones=estado.op.map(function(o){
-    var propio=o.aloj+o.comidas;
-    var cvOp=cvBase+propio;
+  var opciones=estado.paquetes.map(function(p){
+    var cvOp=0, ivaPax=0;
+    estado.conceptos.forEach(function(c){
+      var v=valorDe(c,p.id);
+      cvOp+=v; ivaPax+=v*c.iva/100;
+    });
     var costePax=(n>0? cfBase/n : NaN)+cvOp;
     var pvpIva, base;
-    if(estado.modoCalculo==='precio'&&o.precio>0){
-      pvpIva=o.precio;
+    if(estado.modoCalculo==='precio'&&p.precio>0){
+      pvpIva=p.precio;
     } else {
       var bruto = estado.baseMargen==='ventas' ? costePax/(1-m) : costePax*(1+m);
       pvpIva=ceilTo(bruto*(1+ivaV), estado.redondeo);
@@ -944,12 +960,11 @@ function calcular(){
     base=pvpIva/(1+ivaV);
     var margenPax=base-costePax;
     return {
-      id:o.id, nombre:o.nombre, personas:o.personas, incl:o.incl,
-      aloj:o.aloj, comidas:o.comidas,
+      id:p.id, nombre:p.nombre, personas:p.personas,
       cvOp:cvOp, costePax:costePax, pvpIva:pvpIva, base:base,
       margenPax:margenPax,
       margenPct: base>0 ? margenPax/base : NaN,
-      ivaSoportadoPax: cvIvaUd + propio*o.iva/100
+      ivaSoportadoPax: ivaPax
     };
   });
 
@@ -967,7 +982,7 @@ function calcular(){
   var ivaRepercutido=ingresosBase*ivaV;
 
   var res={
-    cfBase:cfBase, cfDetalle:cf.detalle, cvBase:cvBase, n:n, opciones:opciones,
+    cfBase:cfBase, cfDetalle:cf.detalle, n:n, opciones:opciones,
     ingresosBase:ingresosBase, costesTot:costesTot, margenTot:margenTot,
     margenPct: ingresosBase>0 ? margenTot/ingresosBase : NaN,
     jornadas:cf.jornadas,
@@ -1073,36 +1088,99 @@ function pintarFilas(){
     var i=document.getElementById('eq-v-'+r.id); if(i) i.value=String(r.iva);
   });
 
-  var cv=document.getElementById('filas-cv');
-  cv.innerHTML = estado.cv.length ? estado.cv.map(function(r){
-    return '<div class="fila fila-coste" data-lista="cv" data-id="'+r.id+'">'+
-      '<input type="text" data-campo="concepto" id="cv-c-'+r.id+'" value="'+esc(r.concepto)+'" placeholder="Concepto" aria-label="Concepto">'+
-      '<input type="text" inputmode="decimal" data-campo="importe" id="cv-i-'+r.id+'" value="'+eur.format(r.importe)+'" aria-label="Importe por persona">'+
-      '<select data-campo="iva" id="cv-v-'+r.id+'" aria-label="Tipo de IVA">'+opcionesIva+'</select>'+
-      '<span class="caja-incl"><input type="checkbox" data-campo="incl" id="cv-x-'+r.id+'" '+(r.incl?'checked':'')+' aria-label="Incluir en el paquete"></span>'+
-      '<button class="quitar" type="button" data-quitar aria-label="Quitar">&times;</button>'+
-    '</div>';
-  }).join('') : '<div class="vacio">Sin costes por participante.</div>';
-  estado.cv.forEach(function(r){ var s=document.getElementById('cv-v-'+r.id); if(s) s.value=String(r.iva); });
+  pintarMatriz();
+}
 
-  var op=document.getElementById('filas-op');
-  var modoPrecio=estado.modoCalculo==='precio';
-  op.innerHTML = estado.op.length ? estado.op.map(function(r){
-    return '<div class="fila fila-opcion" data-lista="op" data-id="'+r.id+'">'+
-      '<input type="text" data-campo="nombre" id="op-n-'+r.id+'" value="'+esc(r.nombre)+'" placeholder="Nombre de la opción" aria-label="Nombre de la opción">'+
-      '<input type="text" inputmode="decimal" data-campo="aloj" id="op-e-'+r.id+'" value="'+eur.format(r.aloj)+'" aria-label="Alojamiento por persona">'+
-      '<input type="text" inputmode="decimal" data-campo="comidas" id="op-c-'+r.id+'" value="'+eur.format(r.comidas)+'" aria-label="Comidas por persona">'+
-      '<select data-campo="iva" id="op-v-'+r.id+'" aria-label="Tipo de IVA">'+opcionesIva+'</select>'+
-      '<input type="text" inputmode="numeric" data-campo="personas" id="op-p-'+r.id+'" value="'+r.personas+'" aria-label="Personas">'+
-      '<span class="caja-incl"><input type="checkbox" data-campo="incl" id="op-x-'+r.id+'" '+(r.incl?'checked':'')+' aria-label="Incluir en el paquete"></span>'+
-      '<button class="quitar" type="button" data-quitar aria-label="Quitar">&times;</button>'+
-      (modoPrecio ? '<div style="grid-column:1/-1;display:flex;align-items:center;gap:9px;padding-top:2px">'+
-        '<label for="op-pv-'+r.id+'" style="margin:0;flex:none">PVP con IVA</label>'+
-        '<input type="text" inputmode="decimal" data-campo="precio" id="op-pv-'+r.id+'" value="'+(r.precio?eur.format(r.precio):'')+'" placeholder="Escribe el precio final" aria-label="Precio de venta con IVA" style="max-width:170px">'+
-      '</div>' : '')+
-    '</div>';
-  }).join('') : '<div class="vacio">Añade al menos una opción para calcular.</div>';
-  estado.op.forEach(function(r){ var s=document.getElementById('op-v-'+r.id); if(s) s.value=String(r.iva); });
+function pintarMatriz(){
+  var cont=document.getElementById('matriz');
+  var P=estado.paquetes, C=estado.conceptos;
+
+  if(!P.length){
+    cont.innerHTML='<div class="vacio" style="grid-column:1/-1">Añade un paquete para empezar. Si solo vendes una modalidad, con uno basta.</div>';
+    cont.style.gridTemplateColumns='1fr';
+    return;
+  }
+
+  cont.style.gridTemplateColumns=
+    'minmax(140px,1.4fr) 66px 34px repeat('+P.length+',minmax(100px,1fr)) 30px';
+
+  var h='';
+  /* cabecera: los paquetes son columnas */
+  h+='<span class="cab">Concepto</span><span class="cab cen">IVA</span><span class="cab cen">Incl.</span>';
+  P.forEach(function(p){
+    h+='<span class="pkg">'+
+      '<input type="text" data-pkg="'+p.id+'" data-campo="nombre" id="pk-n-'+p.id+'" value="'+esc(p.nombre)+'" placeholder="Paquete" aria-label="Nombre del paquete">'+
+      (P.length>1?'<button class="quitar" type="button" data-quitar-pkg="'+p.id+'" aria-label="Quitar paquete">&times;</button>':'')+
+    '</span>';
+  });
+  h+='<span></span>';
+
+  if(!C.length){
+    h+='<span class="etiqueta" style="grid-column:1/-1;padding:10px 0">Sin conceptos todavía. Pulsa «Añadir concepto».</span>';
+  }
+  C.forEach(function(c){
+    h+='<input type="text" data-cpt="'+c.id+'" data-campo="nombre" id="cp-n-'+c.id+'" value="'+esc(c.nombre)+'" placeholder="Alojamiento, comidas…" aria-label="Concepto">'+
+       '<select data-cpt="'+c.id+'" data-campo="iva" id="cp-v-'+c.id+'" aria-label="Tipo de IVA">'+opcionesIva+'</select>'+
+       '<span class="caja-incl"><input type="checkbox" data-cpt="'+c.id+'" data-campo="incl" id="cp-x-'+c.id+'" '+(c.incl?'checked':'')+' aria-label="Aparece en el qué incluye"></span>';
+    P.forEach(function(p){
+      h+='<input type="text" inputmode="decimal" data-cpt="'+c.id+'" data-valor="'+p.id+'" id="cp-'+c.id+'-'+p.id+'" value="'+eur.format(valorDe(c,p.id))+'" aria-label="'+esc(c.nombre)+' en '+esc(p.nombre)+'">';
+    });
+    h+='<button class="quitar" type="button" data-quitar-cpt="'+c.id+'" aria-label="Quitar concepto">&times;</button>';
+  });
+
+  h+='<span class="sep"></span>';
+  h+='<span class="etiqueta">Personas</span><span></span><span></span>';
+  P.forEach(function(p){
+    h+='<input type="text" inputmode="numeric" data-pkg="'+p.id+'" data-campo="personas" id="pk-p-'+p.id+'" value="'+p.personas+'" aria-label="Personas en '+esc(p.nombre)+'">';
+  });
+  h+='<span></span>';
+
+  if(estado.modoCalculo==='precio'){
+    h+='<span class="etiqueta">PVP con IVA</span><span></span><span></span>';
+    P.forEach(function(p){
+      h+='<input type="text" inputmode="decimal" data-pkg="'+p.id+'" data-campo="precio" id="pk-v-'+p.id+'" value="'+(p.precio?eur.format(p.precio):'')+'" placeholder="Precio" aria-label="Precio de venta de '+esc(p.nombre)+'">';
+    });
+    h+='<span></span>';
+  }
+
+  cont.innerHTML=h;
+  C.forEach(function(c){
+    var s=document.getElementById('cp-v-'+c.id); if(s) s.value=String(c.iva);
+  });
+  pintarTotalesMatriz();
+}
+
+/* Las dos filas calculadas del pie se repintan en cada tecla, así que van aparte
+   para no reconstruir los campos y perder el foco. */
+function pintarTotalesMatriz(c){
+  c=c||calcular();
+  var cont=document.getElementById('matriz');
+  var viejo=cont.querySelector('.pie-matriz');
+  if(viejo) while(viejo.nextSibling) cont.removeChild(viejo.nextSibling);
+  if(viejo) cont.removeChild(viejo);
+  if(!estado.paquetes.length) return;
+
+  var sep=document.createElement('span');
+  sep.className='sep pie-matriz';
+  cont.appendChild(sep);
+
+  function fila(etiqueta, valores, fuerte){
+    var e=document.createElement('span');
+    e.className='etiqueta'; e.textContent=etiqueta;
+    cont.appendChild(e);
+    cont.appendChild(document.createElement('span'));
+    cont.appendChild(document.createElement('span'));
+    valores.forEach(function(v){
+      var s=document.createElement('span');
+      s.className='valor'+(fuerte?' fuerte':'');
+      s.textContent=v;
+      cont.appendChild(s);
+    });
+    cont.appendChild(document.createElement('span'));
+  }
+
+  fila('Coste por persona', c.opciones.map(function(o){ return money(o.costePax); }), false);
+  fila('Precio con IVA', c.opciones.map(function(o){ return money(o.pvpIva); }), true);
 }
 
 /* ─────────── salidas ─────────── */
@@ -1114,8 +1192,7 @@ function pintarSalidas(){
     totEq+=((r.tipo==='nomina'?0:r.importe)+r.alojamiento+r.dietas)*(r.pct/100);
   });
   document.getElementById('sub-eq').textContent=money(totEq);
-  document.getElementById('sub-cv').textContent=money(c.cvBase);
-  document.getElementById('sub-op').textContent=String(c.n);
+  pintarTotalesMatriz(c);
 
   /* panel de precios */
   var po=document.getElementById('panel-opciones');
@@ -1274,22 +1351,15 @@ function pintarDesglose(c){
   h+='<div class="desglose-grupo"><div class="desglose-cab">'+
      '<span class="tit"><span class="tipo-chip variable">Variable</span>Se multiplica por cada participante</span>'+
      '<b>'+money(totalVar)+'</b></div>';
-  var hayVar=false;
-  estado.cv.forEach(function(r){
-    if(!r.concepto&&!r.importe) return;
-    hayVar=true;
-    h+='<div class="desglose-linea"><span class="concepto">'+esc(r.concepto||'Sin concepto')+'</span>'+
-       '<span class="calc">'+money(r.importe)+' × '+c.n+' pers.  =  '+money(r.importe*c.n)+'</span></div>';
-  });
-  c.opciones.forEach(function(o){
-    if(!o.nombre&&!o.aloj&&!o.comidas) return;
-    var nombre=esc(o.nombre||'Paquete sin nombre');
-    [{et:'alojamiento',v:o.aloj},{et:'comidas',v:o.comidas}].forEach(function(p){
-      if(p.v<=0) return;
+  var hayVar=false, varios=estado.paquetes.length>1;
+  estado.conceptos.forEach(function(cp){
+    c.opciones.forEach(function(o){
+      var v=valorDe(cp,o.id);
+      if(v<=0) return;
       hayVar=true;
-      h+='<div class="desglose-linea"><span class="concepto">'+nombre+
-         ' <span style="color:var(--texto-sec)">· '+p.et+'</span></span>'+
-         '<span class="calc">'+money(p.v)+' × '+o.personas+' pers.  =  '+money(p.v*o.personas)+'</span></div>';
+      h+='<div class="desglose-linea"><span class="concepto">'+esc(cp.nombre||'Sin concepto')+
+         (varios?' <span style="color:var(--texto-sec)">· '+esc(o.nombre||'paquete')+'</span>':'')+'</span>'+
+         '<span class="calc">'+money(v)+' × '+o.personas+' pers.  =  '+money(v*o.personas)+'</span></div>';
     });
   });
   if(!hayVar){
@@ -1324,15 +1394,13 @@ function construirPaquete(c){
 
   var incluye=[];
   estado.cf.forEach(function(r){ if(r.incl&&r.concepto) incluye.push(r.concepto); });
-  estado.cv.forEach(function(r){ if(r.incl&&r.concepto) incluye.push(r.concepto); });
-  var opIncl=estado.op.filter(function(o){ return o.incl; });
-  if(opIncl.length===1){
-    if(opIncl[0].aloj>0) incluye.push(opIncl[0].nombre||'Alojamiento');
-    if(opIncl[0].comidas>0) incluye.push('Comidas');
-  } else if(opIncl.length>1){
-    if(opIncl.some(function(o){ return o.aloj>0; })) incluye.push('Alojamiento según el paquete elegido');
-    if(opIncl.some(function(o){ return o.comidas>0; })) incluye.push('Comidas según el paquete elegido');
-  }
+  estado.conceptos.forEach(function(cp){
+    if(!cp.incl||!cp.nombre) return;
+    var enAlguno=estado.paquetes.some(function(p){ return valorDe(cp,p.id)>0; });
+    if(!enAlguno) return;
+    var enTodos=estado.paquetes.every(function(p){ return valorDe(cp,p.id)>0; });
+    incluye.push((enTodos||estado.paquetes.length<2) ? cp.nombre : cp.nombre+', según el paquete elegido');
+  });
   if(estado.eq.length) incluye.push('Acompañamiento técnico de Bendhora durante toda la salida');
 
   if(incluye.length){
@@ -1343,7 +1411,7 @@ function construirPaquete(c){
 
   var noIncluye=[];
   estado.cf.forEach(function(r){ if(!r.incl&&r.concepto) noIncluye.push(r.concepto); });
-  estado.cv.forEach(function(r){ if(!r.incl&&r.concepto) noIncluye.push(r.concepto); });
+  estado.conceptos.forEach(function(cp){ if(!cp.incl&&cp.nombre) noIncluye.push(cp.nombre); });
   if(noIncluye.length){
     L.push('NO INCLUYE');
     noIncluye.forEach(function(t){ L.push('· '+t); });
@@ -1370,7 +1438,7 @@ function resumenInterno(c){
   L.push('');
   L.push('Participantes previstos: '+c.n);
   L.push('Costes fijos: '+money(c.cfBase));
-  L.push('Coste variable por persona (base común): '+money(c.cvBase));
+  L.push('Coste variable total: '+money(c.costesTot-c.cfBase));
   L.push('');
   c.opciones.forEach(function(o){
     L.push((o.nombre||'Opción')+' — '+o.personas+' pers.');
@@ -1402,9 +1470,38 @@ function buscar(lista,id){
   for(var i=0;i<a.length;i++) if(a[i].id===id) return a[i];
   return null;
 }
+function buscarEn(lista,id){
+  for(var i=0;i<lista.length;i++) if(lista[i].id===id) return lista[i];
+  return null;
+}
+
+function editarMatriz(t){
+  if(t.dataset.cpt){
+    var c=buscarEn(estado.conceptos,t.dataset.cpt);
+    if(!c) return false;
+    if(t.dataset.valor!==undefined) c.valores[t.dataset.valor]=parseNum(t.value);
+    else if(t.dataset.campo==='nombre') c.nombre=t.value;
+    else if(t.dataset.campo==='incl') c.incl=t.checked;
+    else if(t.dataset.campo==='iva') c.iva=parseNum(t.value);
+    return true;
+  }
+  if(t.dataset.pkg){
+    var p=buscarEn(estado.paquetes,t.dataset.pkg);
+    if(!p) return false;
+    if(t.dataset.campo==='nombre') p.nombre=t.value;
+    else if(t.dataset.campo==='personas') p.personas=Math.max(0,Math.round(parseNum(t.value)));
+    else if(t.dataset.campo==='precio') p.precio=parseNum(t.value);
+    return true;
+  }
+  return false;
+}
 
 document.addEventListener('input',function(e){
   var t=e.target;
+  if(t.dataset&&(t.dataset.cpt||t.dataset.pkg)){
+    if(editarMatriz(t)) pintarSalidas();
+    return;
+  }
   var fila=t.closest?t.closest('.fila'):null;
   if(fila){
     var reg=buscar(fila.dataset.lista,fila.dataset.id);
@@ -1435,6 +1532,10 @@ document.addEventListener('input',function(e){
 
 document.addEventListener('change',function(e){
   var t=e.target;
+  if(t.dataset&&(t.dataset.cpt||t.dataset.pkg)){
+    if(editarMatriz(t)) pintarSalidas();
+    return;
+  }
   var fila=t.closest?t.closest('.fila'):null;
   if(fila&&t.dataset.campo){
     var reg=buscar(fila.dataset.lista,fila.dataset.id);
@@ -1464,6 +1565,17 @@ document.addEventListener('click',function(e){
 
   if(!t||!t.matches) return;
 
+  if(t.dataset.quitarCpt){
+    estado.conceptos=estado.conceptos.filter(function(c){ return c.id!==t.dataset.quitarCpt; });
+    pintarFilas(); pintarSalidas(); return;
+  }
+  if(t.dataset.quitarPkg){
+    var pid=t.dataset.quitarPkg;
+    estado.paquetes=estado.paquetes.filter(function(p){ return p.id!==pid; });
+    estado.conceptos.forEach(function(c){ delete c.valores[pid]; });
+    pintarFilas(); pintarSalidas(); return;
+  }
+
   if(t.matches('[data-quitar]')){
     var fila=t.closest('.fila');
     var lista=fila.dataset.lista, id=fila.dataset.id;
@@ -1474,9 +1586,9 @@ document.addEventListener('click',function(e){
   var anadir=t.dataset?t.dataset.anadir:null;
   if(anadir){
     if(anadir==='cf') estado.cf.push({id:nextId(),concepto:'',importe:0,iva:21,incl:true,capacidad:0});
-    if(anadir==='cv') estado.cv.push({id:nextId(),concepto:'',importe:0,iva:21,incl:true});
     if(anadir==='eq') estado.eq.push({id:nextId(),nombre:'',tipo:'nomina',jornadas:1,pct:100,importe:0,alojamiento:0,dietas:0,iva:10});
-    if(anadir==='op') estado.op.push({id:nextId(),nombre:'',aloj:0,comidas:0,iva:10,personas:0,incl:true,precio:0});
+    if(anadir==='concepto') estado.conceptos.push({id:nextId(),nombre:'',iva:10,incl:true,valores:{}});
+    if(anadir==='paquete') estado.paquetes.push({id:'p'+Date.now().toString(36),nombre:'',personas:0,precio:0});
     pintarFilas(); pintarSalidas(); return;
   }
 
@@ -1553,7 +1665,7 @@ function instantanea(){
     datos:{
       nombre:estado.nombre, lugar:estado.lugar, fechas:estado.fechas, fecha:estado.fecha,
       tipo:estado.tipo, limite:estado.limite,
-      cf:estado.cf, eq:estado.eq, cv:estado.cv, op:estado.op,
+      cf:estado.cf, eq:estado.eq, conceptos:estado.conceptos, paquetes:estado.paquetes,
       modoCalculo:estado.modoCalculo, baseMargen:estado.baseMargen,
       margen:estado.margen, ivaVenta:estado.ivaVenta, redondeo:estado.redondeo
     },
@@ -1727,19 +1839,50 @@ function cargar(d){
   ['nombre','lugar','fechas','fecha','tipo','limite','modoCalculo','baseMargen','margen','ivaVenta','redondeo'].forEach(function(k){
     if(d[k]!==undefined) estado[k]=d[k];
   });
-  ['cf','eq','cv','op'].forEach(function(k){
+  ['cf','eq'].forEach(function(k){
     if(Array.isArray(d[k])) estado[k]=d[k].map(function(r){
       var copia={}; for(var p in r) copia[p]=r[p];
       copia.id=nextId(); return copia;
     });
   });
-  /* actividades guardadas antes de que existieran el aforo y la imputación de horas */
+
+  if(Array.isArray(d.conceptos)&&Array.isArray(d.paquetes)){
+    /* El id del paquete se conserva: es la clave con la que cada concepto
+       guarda su importe por columna. */
+    estado.paquetes=d.paquetes.map(function(p){
+      var copia={}; for(var k in p) copia[k]=p[k]; return copia;
+    });
+    estado.conceptos=d.conceptos.map(function(c){
+      var copia={nombre:c.nombre,iva:c.iva,incl:c.incl,valores:{},id:nextId()};
+      for(var v in (c.valores||{})) copia.valores[v]=c.valores[v];
+      return copia;
+    });
+  } else if(Array.isArray(d.cv)||Array.isArray(d.op)){
+    /* Actividades guardadas con los dos bloques separados: se pasan a matriz. */
+    var paqs=(d.op||[]).map(function(o,i){
+      return {id:o.id||('p'+i), nombre:o.nombre||('Paquete '+(i+1)),
+              personas:o.personas||0, precio:o.precio||0};
+    });
+    if(!paqs.length) paqs=[{id:'p1',nombre:'Paquete',personas:0,precio:0}];
+    var cps=[];
+    (d.cv||[]).forEach(function(r){
+      var val={}; paqs.forEach(function(p){ val[p.id]=r.importe||0; });
+      cps.push({id:nextId(),nombre:r.concepto||'',iva:r.iva||10,incl:r.incl!==false,valores:val});
+    });
+    var valA={}, valC={}, hayA=false, hayC=false;
+    (d.op||[]).forEach(function(o,i){
+      var pid=paqs[i].id;
+      valA[pid]=o.aloj||o.extra||0; valC[pid]=o.comidas||0;
+      if(valA[pid]>0) hayA=true;
+      if(valC[pid]>0) hayC=true;
+    });
+    if(hayA) cps.push({id:nextId(),nombre:'Alojamiento',iva:10,incl:true,valores:valA});
+    if(hayC) cps.push({id:nextId(),nombre:'Comidas',iva:10,incl:true,valores:valC});
+    estado.paquetes=paqs;
+    estado.conceptos=cps;
+  }
+
   estado.cf.forEach(function(r){ if(r.capacidad===undefined) r.capacidad=0; });
-  estado.op.forEach(function(r){
-    if(r.aloj===undefined) r.aloj=(r.extra||0);
-    if(r.comidas===undefined) r.comidas=0;
-    delete r.extra;
-  });
   estado.eq.forEach(function(r){
     if(r.tipo===undefined) r.tipo=(r.vinculo==='externo')?'externo':'nomina';
     if(r.importe===undefined) r.importe=(r.personal!==undefined?r.personal:(r.honorarios||0));
