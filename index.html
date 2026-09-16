@@ -652,7 +652,7 @@ tr.bajo td{color:var(--texto-sec)}
         <div class="tarjeta-cab"><h2>Costes por participante</h2>
           <span style="display:flex;gap:6px;align-items:center;flex:none">
             <span class="tipo-chip variable">Se multiplica</span><span class="etiqueta-num">4</span></span></div>
-        <p class="tarjeta-nota">Cada línea es un coste: alojamiento, comidas, dorsal, seguro, lo que sea. Cada columna es un paquete con su propio precio de venta. Los importes son siempre <b>de una sola persona</b>: si la individual cuesta 120 € escribe 120, no 120 por los que van. <b>Deja en cero lo que ese paquete no lleve</b>, y si un coste lo paga todo el mundo igual, escribe la misma cifra en todas las columnas.</p>
+        <p class="tarjeta-nota">Cada línea es un coste: alojamiento, comidas, dorsal, seguro, lo que sea. Los importes son siempre <b>de una sola persona</b>, no del grupo ni de la habitación. Como las facturas de hotel vienen por habitación, <b>puedes escribir la cuenta</b>: si la doble cuesta 290 € entre dos, escribe <b>290/2</b> y pone 145. Vale cualquier operación, también <b>60*2</b> para dos noches.<br><br>Con <b>Añadir paquete</b> aparece una columna nueva y puedes montar dos o tres modalidades con precios distintos —individual y doble, o básico y premium—. Deja en cero lo que ese paquete no lleve, y si un coste lo paga todo el mundo igual, escribe la misma cifra en todas las columnas.</p>
         <div class="contenedor-tabla"><div class="matriz" id="matriz"></div></div>
         <div class="anadir-fila">
           <button class="anadir" type="button" data-anadir="concepto">Añadir concepto</button>
@@ -840,10 +840,9 @@ var pct = new Intl.NumberFormat('es-ES',{minimumFractionDigits:1,maximumFraction
 function money(v){ return (isFinite(v)?eur.format(v):'—')+' €'; }
 function percent(v){ return (isFinite(v)?pct.format(v*100):'—')+' %'; }
 
-function parseNum(txt){
-  if(txt===null||txt===undefined) return 0;
-  var s=String(txt).trim().replace(/[^\d,.\-]/g,'');
-  if(!s) return 0;
+function numeroSimple(txt){
+  var s=String(txt).replace(/[^\d,.\-]/g,'');
+  if(!s) return NaN;
   var lastComma=s.lastIndexOf(','), lastDot=s.lastIndexOf('.');
   if(lastComma>-1&&lastDot>-1){
     if(lastComma>lastDot){ s=s.replace(/\./g,'').replace(',','.'); }
@@ -851,7 +850,62 @@ function parseNum(txt){
   } else if(lastComma>-1){
     s=s.replace(/\./g,'').replace(',','.');
   }
-  var n=parseFloat(s);
+  return parseFloat(s);
+}
+
+/* Las facturas de hotel vienen por habitación, así que en cualquier casilla se
+   puede escribir la cuenta —290/2 para una doble— en vez del resultado.
+   Se analiza a mano en vez de con eval para no ejecutar nada de lo que se teclea. */
+function evaluarExpresion(s){
+  var i=0;
+  function saltar(){ while(i<s.length&&s[i]===' ') i++; }
+  function numero(){
+    saltar();
+    var ini=i;
+    while(i<s.length&&/[\d.,]/.test(s[i])) i++;
+    return i===ini ? NaN : numeroSimple(s.slice(ini,i));
+  }
+  function factor(){
+    saltar();
+    if(s[i]==='('){ i++; var v=suma(); saltar(); if(s[i]===')') i++; return v; }
+    if(s[i]==='-'){ i++; return -factor(); }
+    if(s[i]==='+'){ i++; return factor(); }
+    return numero();
+  }
+  function producto(){
+    var v=factor();
+    for(;;){
+      saltar();
+      if(s[i]==='*'){ i++; v*=factor(); }
+      else if(s[i]==='/'){ i++; var d=factor(); v=(d===0?NaN:v/d); }
+      else return v;
+    }
+  }
+  function suma(){
+    var v=producto();
+    for(;;){
+      saltar();
+      if(s[i]==='+'){ i++; v+=producto(); }
+      else if(s[i]==='-'){ i++; v-=producto(); }
+      else return v;
+    }
+  }
+  var r=suma();
+  saltar();
+  return (i>=s.length&&isFinite(r)) ? r : NaN;
+}
+
+function parseNum(txt){
+  if(txt===null||txt===undefined) return 0;
+  var s=String(txt).trim().replace(/[€\s]/g,'');
+  if(!s) return 0;
+  /* Si parece una cuenta se trata como tal: cuando no cuadra devuelve cero, nunca
+     los dígitos sueltos, que convertirían 10/0 en 100. */
+  if(/[+*/()]/.test(s)||/[-]/.test(s.slice(1))){
+    var v=evaluarExpresion(s);
+    return isFinite(v)?v:0;
+  }
+  var n=numeroSimple(s);
   return isFinite(n)?n:0;
 }
 function ceilTo(v,step){
@@ -1165,15 +1219,20 @@ function pintarMatriz(){
   cont.style.gridTemplateColumns=
     'minmax(140px,1.4fr) 66px 34px repeat('+P.length+',minmax(100px,1fr)) 30px';
 
-  var h='';
-  /* cabecera: los paquetes son columnas */
+  var h='', unico=P.length===1;
+  /* Con un solo paquete no hay nada que nombrar ni que comparar: la columna es
+     simplemente el importe, y la idea de «paquete» no aparece hasta que hace falta. */
   h+='<span class="cab">Concepto</span><span class="cab cen">IVA</span><span class="cab cen">Incl.</span>';
-  P.forEach(function(p){
-    h+='<span class="pkg">'+
-      '<input type="text" data-pkg="'+p.id+'" data-campo="nombre" id="pk-n-'+p.id+'" value="'+esc(p.nombre)+'" placeholder="Paquete" aria-label="Nombre del paquete">'+
-      (P.length>1?'<button class="quitar" type="button" data-quitar-pkg="'+p.id+'" aria-label="Quitar paquete">&times;</button>':'')+
-    '</span>';
-  });
+  if(unico){
+    h+='<span class="cab der">Importe por persona</span>';
+  } else {
+    P.forEach(function(p){
+      h+='<span class="pkg">'+
+        '<input type="text" data-pkg="'+p.id+'" data-campo="nombre" id="pk-n-'+p.id+'" value="'+esc(p.nombre)+'" placeholder="Nombre del paquete" aria-label="Nombre del paquete">'+
+        '<button class="quitar" type="button" data-quitar-pkg="'+p.id+'" aria-label="Quitar paquete">&times;</button>'+
+      '</span>';
+    });
+  }
   h+='<span></span>';
 
   if(!C.length){
@@ -1261,9 +1320,10 @@ function pintarSalidas(){
     po.innerHTML='<div class="res-opcion"><div class="res-nombre">Faltan datos</div>'+
       '<div style="opacity:.7;font-size:13.5px;line-height:1.5">Añade una opción con al menos una persona para ver el precio.</div></div>';
   } else {
+    var unicoPkg=c.opciones.length===1;
     po.innerHTML=c.opciones.map(function(o){
       return '<div class="res-opcion">'+
-        '<div class="res-nombre">'+esc(o.nombre||'Opción sin nombre')+'</div>'+
+        (unicoPkg?'':'<div class="res-nombre">'+esc(o.nombre||'Paquete sin nombre')+'</div>')+
         '<div class="res-pvp">'+money(o.pvpIva)+'<small>'+o.personas+' pers.</small></div>'+
         '<div class="res-detalle">'+
           '<div><span>Coste</span><b>'+money(o.costePax)+'</b></div>'+
@@ -1447,8 +1507,11 @@ function construirPaquete(c){
   L.push('');
 
   if(c.opciones.length&&c.n>0){
+    var unico=c.opciones.length===1;
     c.opciones.forEach(function(o){
-      L.push((o.nombre||'Opción')+': '+money(o.pvpIva)+' por persona, IVA incluido');
+      L.push(unico
+        ? money(o.pvpIva)+' por persona, IVA incluido'
+        : (o.nombre||'Paquete')+': '+money(o.pvpIva)+' por persona, IVA incluido');
     });
     L.push('');
   }
