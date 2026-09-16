@@ -521,15 +521,11 @@ tr.bajo td{color:var(--texto-sec)}
         <span>Sergi, Devi, Pep o el monitor que toque. Siempre coste fijo, nunca se divide como si fueran participantes. Van sus dietas, su alojamiento y solo el dinero que se paga de más: la jornada ordinaria no cuenta porque ya está repartida por línea. Los días fuera se cuentan enteros aunque el coste vaya al 50 %.</span>
       </div>
       <div class="paso">
-        <b>4 · Coste por participante</b>
-        <span>Lo que paga todo el mundo por igual: dorsal, seguro, camiseta. Siempre el importe de una sola persona. Lo que cambia según el paquete va en el bloque 5.</span>
+        <b>4 · Costes por participante</b>
+        <span>Lo que va por persona: alojamiento, comidas, dorsal, seguro. Siempre el importe de una sola persona. Si no todos pagan lo mismo —individual y doble—, «Añadir paquete» abre una columna más y cada una sale con su precio.</span>
       </div>
       <div class="paso">
-        <b>5 · Paquetes</b>
-        <span>Cada línea es un paquete con su precio. Alojamiento y comidas van en columnas distintas porque no siempre hay los dos: deja en cero lo que no haya. Pon cuánta gente va en cada paquete y el total de participantes se calcula solo.</span>
-      </div>
-      <div class="paso">
-        <b>6 · Margen y precio</b>
+        <b>5 · Margen y precio</b>
         <span>Elige el margen que quieres y la herramienta te da el precio. O al revés: pon tú el precio y te dice qué margen te queda. Los importes se meten <b>siempre sin IVA</b>, que es como vienen en la factura del proveedor.</span>
       </div>
     </div>
@@ -628,7 +624,7 @@ tr.bajo td{color:var(--texto-sec)}
         <div class="tarjeta-cab"><h2>Costes fijos de la actividad</h2>
           <span style="display:flex;gap:6px;align-items:center;flex:none">
             <span class="tipo-chip fijo">Se reparte</span><span class="etiqueta-num">2</span></span></div>
-        <p class="tarjeta-nota">El importe <b>entero</b> del autocar, el combustible, los peajes. Nunca un total de hotel ni de comidas: eso va en los bloques 4 y 5. En <b>cubre hasta</b> pon el aforo si el coste tiene uno —las plazas del autocar— y déjalo vacío si no lo tiene. <b>Si cada uno va por su cuenta o en transporte público, deja el bloque vacío</b>: no hay transporte que repartir y la salida rinde desde el primer inscrito.</p>
+        <p class="tarjeta-nota">El importe <b>entero</b> del autocar, el combustible, los peajes. Nunca un total de hotel ni de comidas: eso va en el bloque 4. En <b>cubre hasta</b> pon el aforo si el coste tiene uno —las plazas del autocar— y déjalo vacío si no lo tiene. <b>Si cada uno va por su cuenta o en transporte público, deja el bloque vacío</b>: no hay transporte que repartir y la salida rinde desde el primer inscrito.</p>
         <div class="fila-cab fila-cf">
           <span>Concepto</span><span class="der">Importe sin IVA</span><span class="cen">IVA</span><span class="der">Cubre hasta</span><span class="cen">Incl.</span><span></span>
         </div>
@@ -651,7 +647,15 @@ tr.bajo td{color:var(--texto-sec)}
         <div class="tarjeta-cab"><h2>Costes por participante</h2>
           <span style="display:flex;gap:6px;align-items:center;flex:none">
             <span class="tipo-chip variable">Se multiplica</span><span class="etiqueta-num">4</span></span></div>
-        <p class="tarjeta-nota">Cada línea es un coste: alojamiento, comidas, dorsal, seguro, lo que sea. Los importes son siempre <b>de una sola persona</b>, no del grupo ni de la habitación. Como las facturas de hotel vienen por habitación, <b>puedes escribir la cuenta</b>: si la doble cuesta 290 € entre dos, escribe <b>290/2</b> y pone 145. Vale cualquier operación, también <b>60*2</b> para dos noches.<br><br>Con <b>Añadir paquete</b> aparece una columna nueva y puedes montar dos o tres modalidades con precios distintos —individual y doble, o básico y premium—. Deja en cero lo que ese paquete no lleve, y si un coste lo paga todo el mundo igual, escribe la misma cifra en todas las columnas.</p>
+        <p class="tarjeta-nota">Cada línea es un coste: alojamiento, comidas, dorsal, seguro, lo que sea. Los importes son siempre <b>de una sola persona</b>, no del grupo ni de la habitación. Como las facturas de hotel vienen por habitación, <b>puedes escribir la cuenta</b>: si la doble cuesta 290 € entre dos, escribe <b>290/2</b> y pone 145. Vale cualquier operación, también <b>60*2</b> para dos noches.</p>
+        <div class="aviso" style="margin-bottom:14px">
+          <span class="marca"></span>
+          <div>
+            <p style="margin-bottom:6px"><b>Cuándo hace falta un segundo paquete.</b> Solo si no todo el mundo paga lo mismo: unos van en individual y otros en doble, o unos comen y otros no. Si todos pagan igual, con una columna basta y nada de esto aparece.</p>
+            <p style="margin-bottom:6px"><b>Cómo se hace.</b> Pulsa «Añadir paquete», pon nombre a cada columna y escribe en cada una lo que cuesta por persona en esa modalidad. Lo que es igual para todos —el dorsal— se repite en las dos. En «Personas», cuántos van en cada una.</p>
+            <p><b>Cómo se lee.</b> Cada columna sale con su propio precio en el panel de la derecha. Los costes fijos se reparten entre todos los participantes juntos, vayan en la modalidad que vayan: en el ejemplo, 14 en individual y 14 en doble, 28 en total.</p>
+          </div>
+        </div>
         <div class="contenedor-tabla"><div class="matriz" id="matriz"></div></div>
         <div class="anadir-fila">
           <button class="anadir" type="button" data-anadir="concepto">Añadir concepto</button>
@@ -660,8 +664,8 @@ tr.bajo td{color:var(--texto-sec)}
       </section>
 
       <section class="tarjeta">
-        <div class="tarjeta-cab"><h2>Margen y precio</h2><span class="etiqueta-num">6</span></div>
-        <p class="tarjeta-nota">Decide desde dónde quieres calcular. Con <b>el precio que pongo</b>, aparece un campo de PVP dentro de cada opción del bloque 5: escribes ahí el precio final y la herramienta te dice el margen que queda.</p>
+        <div class="tarjeta-cab"><h2>Margen y precio</h2><span class="etiqueta-num">5</span></div>
+        <p class="tarjeta-nota">Decide desde dónde quieres calcular. Con <b>el precio que pongo</b>, aparece una fila «PVP con IVA» al pie de la tabla del bloque 4, una casilla por paquete: escribes ahí el precio final y la herramienta te dice el margen que queda.</p>
 
         <div style="margin-bottom:14px">
           <label for="seg-calculo">Calcular desde</label>
@@ -993,11 +997,12 @@ var estado={
      paquete una columna. Así un coste común se escribe una vez por paquete sin
      tener que decidir a qué bloque pertenece. */
   paquetes:[
-    {id:'p1',nombre:'Habitación individual',personas:28,precio:0}
+    {id:'p1',nombre:'Habitación individual',personas:14,precio:0},
+    {id:'p2',nombre:'Habitación doble',personas:14,precio:0}
   ],
   conceptos:[
-    {id:nextId(),nombre:'Alojamiento',iva:10,incl:true,valores:{p1:120}},
-    {id:nextId(),nombre:'Dorsal / inscripción',iva:10,incl:true,valores:{p1:0}}
+    {id:nextId(),nombre:'Alojamiento',iva:10,incl:true,valores:{p1:120,p2:80}},
+    {id:nextId(),nombre:'Dorsal / inscripción',iva:10,incl:true,valores:{p1:40,p2:40}}
   ],
   modoCalculo:'margen',
   baseMargen:'ventas',
